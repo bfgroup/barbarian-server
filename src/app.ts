@@ -7,6 +7,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 import express from "express";
 import { Request, Response } from "express";
+import { AddressInfo } from "net"
 
 // Conan Server V1..
 
@@ -14,7 +15,10 @@ var epv1 = express.Router();
 
 function epv1_ping(req: Request, res: Response) {
 	console.log("[INFO] epv1_ping: params = " + JSON.stringify(req.params));
-	send_json(res, { "hello": "Welcome Barbarians!" });
+	send_json(res, {
+		"hello": "Welcome Barbarians!",
+		"version": process.env.npm_package_version
+	});
 }
 epv1.get('/ping', epv1_ping);
 
@@ -87,7 +91,10 @@ Fallback.
 */
 function epv1_hello(req: Request, res: Response) {
 	console.log("[INFO] epv1_welcome: url = " + req.url);
-	send_json(res, { "hello": "Welcome Barbarians!" });
+	send_json(res, {
+		"hello": "Welcome Barbarians!",
+		"version": process.env.npm_package_version
+	});
 }
 epv1.get('*', epv1_hello);
 
@@ -110,7 +117,10 @@ Fallback.
 */
 function epv2_hello(req: Request, res: Response) {
 	console.log("[INFO] epv2_welcome: url = " + req.url);
-	send_json(res, { "hello": "Welcome Level 2 Barbarians!" });
+	send_json(res, {
+		"hello": "Welcome Level 2 Barbarians!",
+		"version": process.env.npm_package_version
+	});
 }
 epv1.get('*', epv2_hello);
 
@@ -141,9 +151,14 @@ function get_github_recipe_data_url(req: Request) {
 }
 
 function send_json(res: Response, data: object) {
-	// res.setHeader("X-Conan-Server-Capabilities", "revisions")
+	// res.setHeader("X-Conan-Server-Capabilities", "revisions");
+	res.setHeader("X-Conan-Server-Capabilities", "");
 	res.setHeader("Content-Type", "application/json");
 	res.status(200).send(Buffer.from(JSON.stringify(data)));
 }
 
-export { app };
+const server = app.listen(5000, '0.0.0.0', () => {
+	const { port, address } = server.address() as AddressInfo;
+	console.log('Server listening on:', 'http://' + address + ':' + port);
+}
+);
