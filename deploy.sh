@@ -6,6 +6,6 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 
 npm run build
-scp dist/app.js bfgbarbarian@barbarian.bfgroup.xyz:/home/bfgbarbarian/barbarian.bfgroup.xyz/app.js
-scp package.json bfgbarbarian@barbarian.bfgroup.xyz:/home/bfgbarbarian/barbarian.bfgroup.xyz/package.json
-ssh bfgbarbarian@barbarian.bfgroup.xyz "cd /home/bfgbarbarian/barbarian.bfgroup.xyz && npm install"
+b2 src//html
+scp dist/*.js dist/*.css dist/*.png dist/*.html dist/*.ico package.json bfgbarbarian@barbarian.bfgroup.xyz:/home/bfgbarbarian/barbarian.bfgroup.xyz/
+ssh bfgbarbarian@barbarian.bfgroup.xyz "cd /home/bfgbarbarian/barbarian.bfgroup.xyz && npm install && touch tmp/restart.txt"

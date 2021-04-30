@@ -1,6 +1,6 @@
 = Barbarian
 
-Barbarian is a Conan meta-server serving package recipes directly from GitHub repositories.
+Barbarian is a Conan meta-server providing package recipes directly from GitHub repositories.
 
 == License
 

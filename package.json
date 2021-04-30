@@ -5,7 +5,7 @@
 	"main": "dist/app.js",
 	"scripts": {
 		"prestart": "npm run build",
-		"prebuild": "rm -rf dist/*",
+		"prebuild": "rm -rf dist/* && b2 src//html",
 		"build": "tsc",
 		"start": "node dist/app.js"
 	},

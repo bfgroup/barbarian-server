@@ -131,11 +131,12 @@ app.use(express.json());
 app.use("/github/v1", epv1);
 app.use("/github/v2", epv2);
 
-function ep_welcome(req: Request, res: Response) {
-	console.log("[INFO] ep_welcome: url = " + req.url);
-	res.send('Welcome Barbarians!');
-}
-app.get('*', ep_welcome);
+// function ep_welcome(req: Request, res: Response) {
+// 	console.log("[INFO] ep_welcome: url = " + req.url);
+// 	res.send('Welcome Barbarians!');
+// }
+// app.get('*', ep_welcome);
+app.use(express.static(__dirname));
 
 // Utility..
 

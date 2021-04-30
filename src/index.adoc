@@ -1,0 +1,34 @@
+= Barbarian
+:copyright: Copyright 2021 René Ferdinand Rivera Morell
+:version-label!:
+:reproducible:
+:nofooter:
+:sectanchors:
+:sectnums:
+:sectnumlevels: 2
+:stylesheet: amber.css
+:icons: font
+:toc: left
+:toclevels: 5
+:caution-caption: ⚑
+:important-caption: ‼
+:note-caption: ℹ
+:tip-caption: ☀
+:warning-caption: ⚠
+
+ifdef::backend-html5[]
+++++
+<style>
+#toctitle {
+	padding: 400px 0 0 0;
+	background: url(barbarian-200.png) no-repeat center/90%;
+	height: 0;
+	overflow: hidden;
+}
+</style>
+++++
+endif::[]
+
+== Welcome
+
+Welcome Barbarians!
