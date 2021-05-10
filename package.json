@@ -29,6 +29,7 @@
 	"homepage": "https://github.com/bfgroup/barbarian#readme",
 	"dependencies": {
 		"express": "^4.17.1",
+		"express-universal-analytics": "^0.7.1",
 		"node-fetch": "^2.6.1"
 	},
 	"devDependencies": {

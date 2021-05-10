@@ -9,6 +9,7 @@ import express from "express";
 import { Request, Response } from "express";
 import { AddressInfo } from "net"
 import fetch from "node-fetch";
+import ExpressGA from "express-universal-analytics";
 
 // Conan Server V1..
 
@@ -244,6 +245,7 @@ function capabilities(req: Request, res: Response, next: any) {
 }
 
 const app = express();
+app.use(ExpressGA('UA-15160295-7'));
 app.use(express.json());
 app.use(log);
 app.use(capabilities);
