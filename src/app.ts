@@ -179,7 +179,7 @@ epv2.get('*', epv2_error);
 function get_github_recipe_base_url(req: Request) {
 	return "https://raw.githubusercontent.com/"
 		+ req.params.package_username + "/" + req.params.package_channel
-		+ "/main/.barbarian/"
+		+ "/barbarian/"
 		+ req.params.package_name + "/" + req.params.package_version;
 }
 
