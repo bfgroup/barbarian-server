@@ -5,7 +5,7 @@
 	"main": "dist/app.js",
 	"scripts": {
 		"prestart": "npm run build",
-		"prebuild": "rm -rf dist/* && b2 src//html",
+		"prebuild": "rm -rf dist/* && b2 src//html && cp .dbconf.mysql.barbarian.bfg.js dist/",
 		"build": "tsc",
 		"start": "node dist/app.js"
 	},
@@ -30,10 +30,12 @@
 	"dependencies": {
 		"express": "^4.17.1",
 		"express-universal-analytics": "^0.7.1",
+		"mysql": "^2.18.1",
 		"node-fetch": "^2.6.1"
 	},
 	"devDependencies": {
 		"@types/express": "^4.17.11",
+		"@types/mysql": "^2.15.18",
 		"@types/node-fetch": "^2.5.10"
 	}
 }

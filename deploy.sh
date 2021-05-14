@@ -8,4 +8,5 @@
 npm run build
 b2 src//html
 scp dist/*.js dist/*.css dist/*.png dist/*.html dist/*.ico package.json bfgbarbarian@barbarian.bfgroup.xyz:/home/bfgbarbarian/barbarian.bfgroup.xyz/
+scp .dbconf*.js bfgbarbarian@barbarian.bfgroup.xyz:/home/bfgbarbarian
 ssh bfgbarbarian@barbarian.bfgroup.xyz "cd /home/bfgbarbarian/barbarian.bfgroup.xyz && npm install && touch tmp/restart.txt"

@@ -10,6 +10,15 @@ import { Request, Response } from "express";
 import { AddressInfo } from "net"
 import fetch from "node-fetch";
 import ExpressGA from "express-universal-analytics";
+import mysql from "mysql";
+
+var db_configuration_path = null;
+if (process.env.NODE_ENV === "production") {
+	db_configuration_path = '/home/bfgbarbarian/.dbconf.mysql.barbarian.bfg.js';
+} else {
+	db_configuration_path = __dirname + '/.dbconf.mysql.barbarian.bfg.js';
+}
+var db_configuration = require(db_configuration_path);
 
 // Conan Server V1..
 
@@ -161,6 +170,9 @@ epv2.get('/conans/:package_name/:package_version/:package_username/:package_chan
 	File download.
 */
 async function epv2_files_download(req: Request, res: Response) {
+	if (req.params.file === "conanfile.py") {
+		track_download(req);
+	}
 	var recipe_data_url = get_github_recipe_data_url(req);
 	res.redirect(recipe_data_url + "/" + req.params.revision + "/files/" + req.params.file);
 }
@@ -231,10 +243,27 @@ async function fetch_github_recipe_data_url_latest(req: Request, res: Response) 
 	}
 }
 
+// mysql.createConnection(dbconf);
+var db_connection: mysql.Connection;
+
+function db() {
+	if (db_connection == null) {
+		db_connection = mysql.createConnection(db_configuration);
+	}
+	return db_connection;
+}
+
 // Server..
 
 function log(req: Request, res: Response, next: any) {
 	console.log("[INFO] url = " + req.url + " params = " + JSON.stringify(req.params));
+	console.log("[INFO] remote = " + (
+		req.connection.remoteAddress
+		|| req.socket.remoteAddress
+		|| req.connection.remoteAddress
+		|| (<string>req.headers['x-forwarded-for']).split(',').pop()
+	));
+	console.log("[INFO] UA = " + (<string>req.headers['user-agent']));
 	next();
 }
 
@@ -242,6 +271,29 @@ function capabilities(req: Request, res: Response, next: any) {
 	res.setHeader("X-Conan-Server-Capabilities", "revisions");
 	// res.setHeader("X-Conan-Server-Capabilities", "");
 	next();
+}
+
+function track_download(req: Request) {
+	db().query(
+		'INSERT INTO barbarian_track SET ?',
+		{
+			package_name: req.params.package_name,
+			package_version: req.params.package_version,
+			package_username: req.params.package_username,
+			package_channel: req.params.package_channel,
+			revision: req.params.revision,
+			dp: req.originalUrl,
+			ua: <string>req.headers['user-agent'],
+			uip: req.connection.remoteAddress
+				|| req.socket.remoteAddress
+				|| (<string>req.headers['x-forwarded-for']).split(',').pop()
+		},
+		function (error: any, results: any, fields: any) {
+			if (error) {
+				console.error("[ERROR] track_download failed: " + error);
+				db().end();
+			}
+		});
 }
 
 const app = express();
