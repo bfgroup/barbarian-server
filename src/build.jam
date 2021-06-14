@@ -10,5 +10,5 @@ using asciidoctor ;
 html index.html : index.adoc ;
 
 install html
-	: index.html barbarian-200.png amber.css favicon.ico
+	: index.html amber.css
 	: <location>../dist ;

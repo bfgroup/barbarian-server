@@ -16,19 +16,6 @@
 :tip-caption: ☀
 :warning-caption: ⚠
 
-ifdef::backend-html5[]
-++++
-<style>
-#toctitle {
-	padding: 400px 0 0 0;
-	background: url(barbarian-200.png) no-repeat center/90%;
-	height: 0;
-	overflow: hidden;
-}
-</style>
-++++
-endif::[]
-
 == Welcome
 
 Welcome Barbarians!
