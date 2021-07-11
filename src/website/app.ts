@@ -16,7 +16,7 @@ var db_configuration_path = null;
 if (process.env.NODE_ENV === "production") {
 	db_configuration_path = '/home/bfgbarbarian/.dbconf.mysql.barbarian.bfg.js';
 } else {
-	db_configuration_path = __dirname + '/.dbconf.mysql.barbarian.bfg.js';
+	db_configuration_path = __dirname + '/../.dbconf.mysql.barbarian.bfg.js';
 }
 var db_configuration = require(db_configuration_path);
 
@@ -118,6 +118,45 @@ epv1.get('*', epv1_hello);
 // Conan Server V2..
 
 var epv2 = express.Router();
+
+/*
+	Package search.
+
+	https://center.conan.io/v2/conans/search?q=zlib%2F%2A
+	{
+	"results" : [ "zlib/1.2.11@_/_", "zlib/1.2.8@_/_" ]
+	}
+*/
+async function epv2_search(req: Request, res: Response) {
+	var query = req.query.q?.toString();
+	query = query?.replace(/_/g, '\\_');
+	query = query?.replace(/%/g, '\\%');
+	query = query?.replace(/[*]/g, '%');
+	var binary = "";
+	if (('ignorecase' in req.query) && req.query.ignorecase == "False") {
+		binary = "BINARY";
+	}
+	var sql = mysql.format(
+		"SELECT"
+		+ " CONCAT(name, '/', version, '@', identity) as ref"
+		+ " FROM barbarian_package"
+		+ " WHERE packager = 'conan'"
+		+ " AND CONCAT(name,'/',version) LIKE " + binary + " ?"
+		+ " ORDER BY name"
+		+ " LIMIT 100",
+		[query]);
+	db().query(sql,
+		function (error: any, results: Array<any>, fields: any) {
+			var refs: string[] = [];
+			if (error) {
+				console.error("[ERROR] search failed: " + error);
+			} else {
+				refs = results.map(row => row.ref);
+			}
+			send_json(res, { "results": refs });
+		});
+}
+epv2.get('/conans/search', epv2_search);
 
 /*
 	Information on the latest recipe revision.
@@ -256,7 +295,7 @@ function db() {
 // Server..
 
 function log(req: Request, res: Response, next: any) {
-	console.log("[INFO] url = " + req.url + " params = " + JSON.stringify(req.params));
+	console.log("[INFO] url = " + req.url + " params = " + JSON.stringify(req.params) + " query = " + JSON.stringify(req.query));
 	console.log("[INFO] remote = " + (
 		req.connection.remoteAddress
 		|| req.socket.remoteAddress
@@ -270,6 +309,8 @@ function log(req: Request, res: Response, next: any) {
 function capabilities(req: Request, res: Response, next: any) {
 	res.setHeader("X-Conan-Server-Capabilities", "revisions");
 	// res.setHeader("X-Conan-Server-Capabilities", "");
+	if (typeof (process.env.npm_package_version) == 'string')
+		res.setHeader("X-Barbarian-Server-Version", process.env.npm_package_version);
 	next();
 }
 
@@ -308,7 +349,7 @@ app.use("/github/v2", epv2);
 // 	res.send('Welcome Barbarians!');
 // }
 // app.get('*', ep_welcome);
-app.use(express.static(__dirname));
+app.use(express.static(__dirname + '/static'));
 
 const server = app.listen(5000, '0.0.0.0', () => {
 	const { port, address } = server.address() as AddressInfo;
