@@ -1,0 +1,3 @@
+PassengerNodejs /home/bfgbarbarian/.nvm/versions/node/v13.14.0/bin/node
+PassengerFriendlyErrorPages on
+SetEnv NOVE_ENV production

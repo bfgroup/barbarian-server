@@ -11,4 +11,4 @@ html index.html : index.adoc ;
 
 install html
 	: index.html amber.css
-	: <location>../../../dist/static ;
+	: <location>../../../barbarian.bfgroup.xyz/static ;

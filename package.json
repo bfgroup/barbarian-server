@@ -2,12 +2,12 @@
 	"name": "barbarian",
 	"version": "0.2.0",
 	"description": "Barbarian is a Conan meta-server serving package recipes directly from GitHub repositories.",
-	"main": "dist/app.js",
+	"main": "barbarian.bfgroup.xyz/app.js",
 	"scripts": {
 		"prestart": "npm run build",
-		"prebuild": "rm -rf dist/* && b2 src/website/static//html",
+		"prebuild": "rm -rf barbarian.bfgroup.xyz/* && b2 src/website/static//html",
 		"build": "tsc",
-		"start": "node dist/app.js"
+		"start": "node barbarian.bfgroup.xyz/app.js"
 	},
 	"repository": {
 		"type": "git",
