@@ -1,0 +1,64 @@
+= xref:home.adoc[Barbarian]
+:copyright: Copyright 2021 René Ferdinand Rivera Morell
+:version-label!:
+:reproducible:
+:nofooter:
+:sectlinks:
+:linkcss:
+:stylesheet: barbarian.css
+:icons: font
+:caution-caption: ⚑
+:important-caption: ‼
+:note-caption: ℹ
+:tip-caption: ☀
+:warning-caption: ⚠
+
+== Creating Packages
+
+=== How It Works
+
+Creating and publishing Conan packages for the Barbarian system is based on
+using a git repo as the storage for the exported recipe revisions of the
+package. That storage happens in a special, full isolated, branch of the
+git repo (`barbarian`). The Barbarian Conan server then uses the recipe
+reference to find the repo and serve the recipe to users.
+
+The key to making the arrangement of storing the exported recipes in a
+public git repo is in mapping the package reference to the git repo. For
+GitHub a reference of `<package>/<version>@<user>/<channel>[#<revision>]`
+is mapped as:
+
+`<package>/<version>`:: Mapped to a directory in the `barbarian` branch
+containing metadata and exported recipe revisions.
+`<user>`:: Mapped to the user or organization in GitHub.
+`<channel>`:: Mapped to the git repo containing the recipe(s).
+
+For example `olc-pge/2.15@bfgroup/conan` is mapped to the repo at
+`https://github.com/bfgroup/conan/` and the `olc-pge/2.15` directory in
+the `barbarian` branch:
+`https://github.com/bfgroup/conan/tree/barbarian/olc-pge/2.15`.
+
+IMPORTANT: This means that the `<user>/channel>` part of the reference
+is required, unlike packages in Conan Center.
+
+=== Requirements
+
+----
+$ pip install barbarian
+----
+
+=== Package Styles
+
+=== The Recipe
+
+=== Export
+
+=== Upload
+
+=== Continuous Integration
+
+----
+$ barbarian ci
+----
+
+include::footer.part.adoc[]

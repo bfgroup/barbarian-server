@@ -1,0 +1,45 @@
+= xref:home.adoc[Barbarian]
+:copyright: Copyright 2021 René Ferdinand Rivera Morell
+:version-label!:
+:reproducible:
+:nofooter:
+:sectlinks:
+:linkcss:
+:stylesheet: barbarian.css
+:icons: font
+:caution-caption: ⚑
+:important-caption: ‼
+:note-caption: ℹ
+:tip-caption: ☀
+:warning-caption: ⚠
+
+== Privacy
+
+We value the privacy of all persons in using the internet. As such we strive
+to minimize the collection of user information to the services provided by
+this site. Herein are the specific information we don't and do collect.
+
+== Website Data
+
+The site, i.e. the software that serves these web pages, does collect access
+information such as time, IP address, page, etc. as regular course of serving
+pages in a temporary basis. This site does not run client side scripts that
+attempts to collect user data of any form. I.e. there are no cookies, or other
+tracking data stored or transmitted.
+
+== Conan Server Data
+
+This site provides for access to data stored on publicly accessible git
+repositories and in order to provide that public information to others will
+store some of that information in a database. Such information is strictly
+restricted to that *only* publicly accessible without extra authentication.
+That information is also used to synthesize aggregate statistics, like
+download counts, as needed and possible to provide that information to
+users.
+
+This site, through the Conan server, also transmits for collection general
+access information for analytical use. This is information that is transmitted
+in the normal operation of the site and HTTP protocol, like user agent, IP
+address, etc. by the Conan client program.
+
+include::footer.part.adoc[]

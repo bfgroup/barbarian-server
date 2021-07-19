@@ -1,0 +1,24 @@
+= xref:home.adoc[Barbarian]
+:copyright: Copyright 2021 René Ferdinand Rivera Morell
+:version-label!:
+:reproducible:
+:nofooter:
+:sectlinks:
+:linkcss:
+:stylesheet: barbarian.css
+:icons: font
+:caution-caption: ⚑
+:important-caption: ‼
+:note-caption: ℹ
+:tip-caption: ☀
+:warning-caption: ⚠
+
+== License
+
+The services and web site that encompass the Barbarian label are licensed
+under the
+link:https://opensource.org/licenses/BSL-1.0[Boost Software License 1.0 (BSL-1.0)].
+The services and web site source code is Copyright 2021 René Ferdinand Rivera Morell.
+
+
+include::footer.part.adoc[]

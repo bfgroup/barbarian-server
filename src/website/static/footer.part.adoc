@@ -1,0 +1,13 @@
+[.footer]
+****
+[.menu.text-left]
+* xref:use.adoc[Use]
+* xref:create.adoc[Create]
+
+[.menu.text-center]
+* xref:home.adoc[Home]
+
+[.menu.text-right]
+* xref:privacy.adoc[Privacy]
+* xref:license.adoc[© 2021]
+****
