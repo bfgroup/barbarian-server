@@ -32,9 +32,9 @@ repositories as a distributed database of those packages.
 * Provide the latest versions of libraries.
 * Build from source to match your configuration.
 * Test your project with in-progress development versions to prepare for
-future releases.
+  future releases.
 
-But there can be disadvantages:
+*But there can be disadvantages:*
 
 * Packages are not curated.
 * There is no cache of binaries.
@@ -53,7 +53,7 @@ packages.
 * Can work with your existing git repo.
 * Provide packages that track in-progress development versions.
 
-But there are negatives:
+*But there are negatives:*
 
 * Library authors are responsible for testing the package.
 * Which will add to your CI testing time.
@@ -74,17 +74,18 @@ We will do our best to avoid disruptions, always.
 _As for the future, in no particular order.._
 
 * Currently we provide for packages published in link:https://github.com/[GitHub]
-git repositories.
-* But we plan to extend this to other publicly available git providers.
+  git repositories. But we plan to extend this to other publicly available git
+  providers like GitLab and Bitbucket.
 * With enough experience we will also look towards adding other Package and
-Dependency Managers to the offering.
+  Dependency Managers to the offering.
 * We will, hopefully soon, add a front end web search for the available packages
-(you can use
-link:https://docs.conan.io/en/latest/reference/commands/consumer/search.html[`conan search`]
-as an alternative for now).
+  (you can use
+  link:https://docs.conan.io/en/latest/reference/commands/consumer/search.html[`conan search`]
+  as an alternative for now).
 * Which will include landing pages for the products and their packages.
-* We will be adding an API for other to build upon that will include all
-information about packages, including access/download statistics.
-* Make the source for the tools and services available for contributions.
+* We will be adding an API for others to build upon that will include all
+  information about packages, including access/download statistics.
+* Make the BSL-1.0 licensed source for the tools and services available for
+  contributions.
 
 include::footer.part.adoc[]

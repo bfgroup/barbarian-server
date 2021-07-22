@@ -12,11 +12,34 @@
 :note-caption: ℹ
 :tip-caption: ☀
 :warning-caption: ⚠
+:source-highlighter: rouge
 
 == Using Packages
 
+Getting to use packages from the services only needs to point the Conan client
+to the Barbarian Conan server. This Conan command will add the Barbarian
+service for GitHub stored packages to you local remotes:
+
+[source,shell]
 ----
 $ conan remote add barbarian-github "https://barbarian.bfgroup.xyz/github"
 ----
+
+With that you can use the rest of the `conan` commands. To start you can do a
+search:
+
+[source,shell]
+----
+$ conan search -r barbarian-github "*"
+Existing package recipes:
+
+duck_invoke/1.0.0@bfgroup/duck_invoke#9257ecc3dee7a4ce45d0aa8fffb8b6d2
+duck_invoke/1.0.0@bfgroup/duck_invoke#cbeee593ebe6d79433e8ffab33730340
+hash_predef/1.14-alpha@grafikrobot/hash-predef#a08d7e1a807a121d787bed0cfc505c1a
+olc-pge/2.15@bfgroup/conan#2b92b620f53c261c1efebda46d6e6fd2
+----
+
+And continue onward using the rest of the
+link:https://docs.conan.io/en/latest/[Conan] tools.
 
 include::footer.part.adoc[]
