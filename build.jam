@@ -8,3 +8,5 @@ http://www.boost.org/LICENSE_1_0.txt)
 import project ;
 
 project /bfg_barbarian : build-dir .bin ;
+
+alias doc : src/website/static//html ;

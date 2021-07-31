@@ -758,6 +758,12 @@ pre.pygments { background: #000 !important; }
 
 .literalblock pre, .listingblock > .content > pre { background: black !important; }
 
+code *, code span { background: black; color: #FA9300; }
+
+code .s, code .s2, code .c, code .nf, code .nc { font-style: italic; }
+
+code .k, code .kn, code .nn, code .nf, code .nc, code .nv { color: #ffbe61; text-shadow: 0px 0px 2px; }
+
 .sidebarblock { border-color: #2e1b00; }
 
 a { color: inherit; }

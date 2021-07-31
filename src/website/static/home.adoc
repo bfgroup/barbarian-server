@@ -12,6 +12,8 @@
 :note-caption: ℹ
 :tip-caption: ☀
 :warning-caption: ⚠
+:source-highlighter: rouge
+:rouge-style: bw
 
 [.text-center]
 The open, decentralized, distributed, easy, build from source Conan package

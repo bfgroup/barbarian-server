@@ -12,6 +12,8 @@
 :note-caption: ℹ
 :tip-caption: ☀
 :warning-caption: ⚠
+:source-highlighter: rouge
+:rouge-style: bw
 
 == Creating Packages
 
@@ -43,20 +45,126 @@ is required, unlike packages in Conan Center.
 
 === Requirements
 
+[source,shell]
 ----
 $ pip install barbarian
 ----
 
 === Package Styles
 
+Creating packages for libraries is possible in a few different ways depending
+on what your goals are. There are two basic aims in packaging libraries:
+creating a package for your own library, or creating a package for an external
+library. For either you have the option to create the package recipe
+either externally, i.e. in a git repository outside of the library itself, or
+internally, i.e. embedding the recipe with the library source git repo.
+
+==== Standalone: Internal
+
+Standalone embedded package recipes are the easiest to manage if you only want
+to package your own library (or contribute directly to someone elses). For this
+the recipe information is stored directly in the git repo of the library.
+
+`*/conanfile.py`::
+	The Conan package recipe.
+`*/conandata.yml`::
+	_Optional_ specification for the library version sources.
+
+You can place the files anywhere you like in your git repo. The only
+requirement is that the optional `conandata.yml` is placed in the same
+directory as the `conanfile.py`. A common location being the root of the repo.
+
+==== Standalone: External
+
+An external standalone package recipe makes it possible to separate the package
+recipe from the library in its own git repo. Like the standalone internal use
+case you can place the recipe files anywhere. But for this the git repo
+would only contain the package recipe files and not the library itself.
+
+==== Collection
+
+You can create a collection of many package recipes in a single dedicated
+git repository. The arrangement for a collection follows the structure of the
+link:https://github.com/conan-io/conan-center-index[Conan Center Index]. For
+a `test` library package we would have:
+
+`recipes`::
+	Contains a directory for each library package.
+`recipes/test`::
+	The versions of package recipes for the `test` library.
+`recipes/test/config.yml`::
+	Configuration listing all the packaged revisions of `test` and the
+	subdirectory of the package recipe.
+`recipes/test/all`::
+	The common case of one generic recipe to handle all revisions would have
+	an `all` subdirectory. You can create as many specific version
+	subdirectories as needed.
+`recipes/test/all/conanfile.py`::
+	The Conan package recipe.
+`recipes/test/all/conandata.yml`::
+	The specification of the library source(s) and optional archive
+	verification hashes.
+
+The Conan Center Index provides
+link:https://github.com/conan-io/conan-center-index/blob/master/docs/how_to_add_packages.md#more-information-about-recipes[additional information]
+on the structure of a collection and the contents of the YAML (`*.yml`) files.
+
 === The Recipe
+
+[source,python]
+----
+from conans import ConanFile, tools
+import os
+
+
+class Recipe(ConanFile):
+    name = "test"
+    homepage = "https://www.test.xyz/test/"
+    description = '''A simple to use, single header, utility for C++11.'''
+    topics = ("header", 'header-only', "cross-platform", "c++11")
+    license = "BSL-1.0"
+    url = "https://github.com/user/test"
+    barbarian = {
+        "description": {
+            "format": "asciidoc",
+            "text": '''Long winded description with usage?'''
+        }
+    }
+    source_subfolder = "source_subfolder"
+    no_copy_source = True
+
+    def source(self):
+        tools.get(**self.conan_data["sources"][self.version],
+                  strip_root=True, destination=self.source_subfolder)
+
+    def package(self):
+        self.copy(pattern="LICENSE.txt", dst="licenses",
+                  src=self.source_subfolder)
+        self.copy(pattern="*.h", dst="include",
+                  src=os.path.join(self.source_subfolder, "include"))
+
+    def package_id(self):
+        self.info.header_only()
+----
 
 === Export
 
+[source,shell]
+----
+$ cd location/of/conanfile
+$ barbarian export . test/0.1.0@user/repo
+----
+
 === Upload
+
+[source,shell]
+----
+$ barbarian upload test/0.1@user/repo
+----
 
 === Continuous Integration
 
+[source,shell]
 ----
 $ barbarian ci
 ----

@@ -12,6 +12,8 @@
 :note-caption: ℹ
 :tip-caption: ☀
 :warning-caption: ⚠
+:source-highlighter: rouge
+:rouge-style: bw
 
 == Privacy
 
