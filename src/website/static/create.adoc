@@ -45,6 +45,11 @@ is required, unlike packages in Conan Center.
 
 === Requirements
 
+To manage the aspects of creating and publishing Barbarian style Conan
+packages we use the `barbarian` tool. It behaves in a similar way to the
+`conan` too. So it should be fairly obvious how to use it if you already know
+the `conan` tool. First step is to install the `barbarian` tool:
+
 [source,shell]
 ----
 $ pip install barbarian
@@ -111,43 +116,45 @@ on the structure of a collection and the contents of the YAML (`*.yml`) files.
 
 === The Recipe
 
-[source,python]
+Barbarian Conan package recipes follow the same structure of regular packages.
+But unlike Conan Center Index recipes, there are no restrictions to what you
+can do in them. With the one caveat that there are no binary packages cached.
+But to make things even easier there is a `barbarian new` tool to help you
+easily create simple package recipes to get you started.
+
+[source,shell]
 ----
-from conans import ConanFile, tools
-import os
-
-
-class Recipe(ConanFile):
-    name = "test"
-    homepage = "https://www.test.xyz/test/"
-    description = '''A simple to use, single header, utility for C++11.'''
-    topics = ("header", 'header-only', "cross-platform", "c++11")
-    license = "BSL-1.0"
-    url = "https://github.com/user/test"
-    barbarian = {
-        "description": {
-            "format": "asciidoc",
-            "text": '''Long winded description with usage?'''
-        }
-    }
-    source_subfolder = "source_subfolder"
-    no_copy_source = True
-
-    def source(self):
-        tools.get(**self.conan_data["sources"][self.version],
-                  strip_root=True, destination=self.source_subfolder)
-
-    def package(self):
-        self.copy(pattern="LICENSE.txt", dst="licenses",
-                  src=self.source_subfolder)
-        self.copy(pattern="*.h", dst="include",
-                  src=os.path.join(self.source_subfolder, "include"))
-
-    def package_id(self):
-        self.info.header_only()
+$ cd /project/root
+$ barbarian new test/0.1.0@user/repo --recipe
 ----
+
+That will create a template recipe following the <<Standalone: Internal>>
+structure. Hence you'll get `conanfile.py` and `conandata.yml` files with
+some of the information of your project already filled in, and other
+information with angle markers (`<\<<FIELD>>>`) for you to fill in. The tool
+does fill in some fields with best guesses. For example setting the
+`homepage` to the GitHub `user/repo` location as given in the recipe reference.
+Fields you will want to fill in:
+
+`TOPICS`:: Fill in with a list of topics/tags for the library.
+`LICENSE`:: The license for the library.
+`SHORT_DESCRIPTION`:: A brief, one or two sentence, description of the library.
+`LONG_DESCRIPTION`:: A detailed description of the library. Currently only
+link:https://docs.asciidoctor.org/asciidoc/latest/[AsciiDoc] formatting is
+supported for this field.
+
+After this you can use the regular `conan`
+link:https://docs.conan.io/en/latest/creating_packages/getting_started.html#creating-and-testing-packages[command]
+to build and test that the recipe works. Until we get to exporting the
+recipe.
 
 === Export
+
+In order for one to publish a Barbarian style package it's required to export
+the recipe package. In order to not pollute the global Conan recipe cache
+we use a special `barbarian export` command that places the package locally
+in a `<git-repo-root>/.conan` directory. Following with the previous
+`test` recipe:
 
 [source,shell]
 ----
@@ -155,18 +162,44 @@ $ cd location/of/conanfile
 $ barbarian export . test/0.1.0@user/repo
 ----
 
+TIP: It's recommended to add `/.conan/` to your `.gitignore` root file to
+avoid accidentally adding this internal directory to git.
+
 === Upload
+
+Now that we have the recipe exported we can publish it for others to use. For
+that we can use the `barbarian upload` command. Which, on the surface, has an
+equivalent effect than the `conan upload` command. Except that instead of
+uploading to the specialized Artifactory repository, it copies the package to
+the special `barbarian` branch with extra meta data for the Barbarian Conan
+server to find.
 
 [source,shell]
 ----
 $ barbarian upload test/0.1@user/repo
 ----
 
+Not only does that put the recipe in the `barbarian` branch. It will also push
+that branch upstream to GitHub.
+
+WARNING: Note that for this arrangement to work the git repository containing
+the recipe and package must be publicly accessible.
+
 === Continuous Integration
+
+At this point you have a working and published package. But it's good to test
+the recipe. For that you can add some CI testing to check that it's all in
+working order. The `barbarian new` tool can also help with that. By using the
+`--ci` option you can add a default CI setup:
 
 [source,shell]
 ----
-$ barbarian ci
+$ barbarian new test/0.1.0@user/repo --ci 
 ----
+
+That creates a GitHub Actions `barbarian.yml` workflow file that uses the
+link:https://github.com/bincrafters/bincrafters-package-tools[Bincrafters Package Tools]
+to automatically generate and run various checks depending on the style
+of recipe you have.
 
 include::footer.part.adoc[]
