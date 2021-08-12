@@ -25,7 +25,7 @@ setup(
     license='BSL 1.0',
     # options
     install_requires=[
-        'conan >= 1.38',
+        'conan >= 1.39',
         'barbarian >= 0.1',
         'mysql-connector-python >= 8.0.0',
         'peewee >= 3.14.4',

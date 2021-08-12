@@ -182,7 +182,9 @@ class Rosina(object):
             0]
         package_ref = "{}/{}@{}".format(package.name,
                                         package.version, package.identity.split("#")[0])
-        package_attributes = None
+        package_attributes = [
+            'barbarian', 'name', 'version', 'url', 'homepage', 'license', 'author',
+            'description', 'topics', 'settings', 'options', 'default_options']
         package_remote = "barbarian"
         package_info = conan_api.inspect(
             package_ref, package_attributes, package_remote)
