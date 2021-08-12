@@ -24,15 +24,10 @@ index.
 The Barbarian service collects and provides packages directly from git
 repositories as a distributed database of those packages.
 
-[IMPORTANT]
-====
-To start using Conan packages directly from GitHub just add the remote with:
-
 [source,shell]
 ----
 $ conan remote add barbarian-github "https://barbarian.bfgroup.xyz/github"
 ----
-====
 
 [.panel]
 [#use]
