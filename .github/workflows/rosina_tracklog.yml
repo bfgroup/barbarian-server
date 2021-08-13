@@ -8,18 +8,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  run:
+  tracklog:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: "actions/setup-python@v2.2.2"
         with: { python-version: "3.x" }
       - name: Upgrade Pip
-        run: |
-          python -m pip install --upgrade pip
+        run: python -m pip install --upgrade pip
       - name: Install Server Tools
-        run: |
-          pip install .
+        run: pip install .
       - name: Process Tracklog
-        run: |
-          barbarian_rosina --help
+        run: barbarian_rosina tracklog
