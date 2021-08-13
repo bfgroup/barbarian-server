@@ -29,7 +29,7 @@ setup(
         # 'barbarian >= 0.1',
         'mysql-connector-python >= 8.0.0',
         'peewee >= 3.14.4',
-        'node-semver >= 0.8.0'
+        'node-semver >= 0.6.1'
     ],
     package_data={'barbarians': []},
     package_dir={"": "src"},
