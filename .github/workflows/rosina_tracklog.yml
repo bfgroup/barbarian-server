@@ -23,4 +23,4 @@ jobs:
           pip install .
       - name: Process Tracklog
         run: |
-          rosina --help
+          barbarian_rosina --help
