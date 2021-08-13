@@ -19,4 +19,9 @@ jobs:
       - name: Install Server Tools
         run: pip install .
       - name: Process Tracklog
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
         run: barbarian_rosina tracklog
