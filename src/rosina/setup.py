@@ -32,8 +32,8 @@ setup(
         'node-semver >= 0.6.1'
     ],
     package_data={'barbarians': []},
-    package_dir={"": "src"},
-    packages=find_packages(where="src"),
+    package_dir={"": "."},
+    packages=find_packages(where="barbarians_rosina"),
     python_requires=">=3.6",
     entry_points={
         'console_scripts': [
