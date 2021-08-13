@@ -190,7 +190,7 @@ DB_PASSWORD, DB_DATABASE.
         package_attributes = [
             'barbarian', 'name', 'version', 'url', 'homepage', 'license', 'author',
             'description', 'topics', 'settings', 'options', 'default_options']
-        package_remote = "barbarian"
+        package_remote = "barbarian-github"
         package_info = conan_api.inspect(
             package_ref, package_attributes, package_remote)
         return package_info
