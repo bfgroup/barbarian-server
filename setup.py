@@ -2,7 +2,7 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE.txt or http://www.boost.org/LICENSE_1_0.txt)
 
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, find_namespace_packages
 
 setup(
     # metadata
@@ -32,12 +32,12 @@ setup(
         'node-semver >= 0.6.1'
     ],
     package_data={'barbarians': []},
-    package_dir={"": "."},
-    packages=find_packages(where="barbarians_rosina"),
+    package_dir={"": "src/tools"},
+    packages=find_namespace_packages(where="src/tools"),
     python_requires=">=3.6",
     entry_points={
         'console_scripts': [
-            'barbarian_rosina=barbarians_rosina.cli:main'
+            'barbarian_rosina=barbarians.rosina.cli:main'
         ]
     }
 )

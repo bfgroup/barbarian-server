@@ -19,7 +19,12 @@ class Rosina(object):
     pdm_conan = "conan"
 
     def __init__(self):
-        ap = ArgumentParser("barbarian_rosina")
+        ap = ArgumentParser(
+            "barbarian_rosina",
+            description='''\
+Required environment variables for database connection: DB_HOST, DB_USER,
+DB_PASSWORD, DB_DATABASE.
+''')
         ap_sub = ap.add_subparsers(dest="command")
 
         # "tracklog" command..
