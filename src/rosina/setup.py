@@ -37,7 +37,7 @@ setup(
     python_requires=">=3.6",
     entry_points={
         'console_scripts': [
-            'barbarian_rosina=barbarians.rosina.cli:main'
+            'barbarian_rosina=barbarians_rosina.cli:main'
         ]
     }
 )
