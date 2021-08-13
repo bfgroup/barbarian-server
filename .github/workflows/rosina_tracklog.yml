@@ -1,10 +1,10 @@
-name: 'Rosina: Tracklog'
+name: "Rosina: Tracklog"
 
 on:
   push:
-    branches: [ ]
+    branches: []
   pull_request:
-    branches: [ ]
+    branches: []
   workflow_dispatch:
 
 jobs:
@@ -12,4 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - { uses: 'actions/setup-python@v2.2.2', with: { python-version: '3.x' } }
+      - uses: "actions/setup-python@v2.2.2"
+        with: { python-version: "3.x" }
+      - name: Install Rosina
+        run: |
+          cd src/rosina
+          pip install .
+      - name: Process Tracklog
+        run: |
+          rosina --help
