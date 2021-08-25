@@ -209,7 +209,7 @@ epv2.get('/conans/:package_name/:package_version/:package_username/:package_chan
 	File download.
 */
 async function epv2_files_download(req: Request, res: Response) {
-	if (req.params.file === "conanfile.py") {
+	if (req.params.file === "conan_export.tgz") {
 		track_download(req);
 	}
 	var recipe_data_url = get_github_recipe_data_url(req);
