@@ -191,6 +191,7 @@ DB_PASSWORD, DB_DATABASE.
             'barbarian', 'name', 'version', 'url', 'homepage', 'license', 'author',
             'description', 'topics', 'settings', 'options', 'default_options']
         package_remote = "barbarian-github"
+        conan_api.config_set("general.revisions_enabled", "True")
         conan_api.remote_add(
             package_remote,
             "https://barbarian.bfgroup.xyz/github",
