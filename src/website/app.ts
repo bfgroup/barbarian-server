@@ -92,15 +92,21 @@ epv1.get('/conans/:package_name/:package_version/:package_username/:package_chan
 	-rw-r--r-- 0/0             157 1969-12-31 18:00 conandata.yml
 */
 async function epv1_download_urls(req: Request, res: Response) {
-	var recipe_data_url = await fetch_github_recipe_data_url_latest(req, res);
-	if (recipe_data_url != null)
-		send_json(res, {
-			"conan_export.tgz": recipe_data_url + "/files/conan_export.tgz",
-			"conanmanifest.txt": recipe_data_url + "/files/conanmanifest.txt",
-			"conanfile.py": recipe_data_url + "/files/conanfile.py"
-		});
-	else
+	var latest_revision = await fetch_github_recipe_latest_revision(req, res);
+	if (latest_revision == null) {
 		send_404(res);
+		return null;
+	}
+	var files = await fetch_json(get_raw_github_recipe_data_url(req) + "/" + latest_revision + "/files.json");
+	if (files == null) {
+		send_404(res);
+		return null;
+	}
+	var downloads: { [file: string]: string } = {};
+	for (var file in files.files) {
+		downloads[file] = get_self_github_recipe_files_url(req, latest_revision) + "/" + file;
+	}
+	return send_json(res, downloads);
 }
 epv1.get('/conans/:package_name/:package_version/:package_username/:package_channel/download_urls', epv1_download_urls);
 
@@ -168,7 +174,7 @@ epv2.get('/conans/search', epv2_search);
 	}
 */
 async function epv2_latest(req: Request, res: Response) {
-	var recipe_data_url = get_github_recipe_data_url(req);
+	var recipe_data_url = get_raw_github_recipe_data_url(req);
 	var latest = await fetch_json(recipe_data_url + "/latest.json");
 	if (latest != null) {
 		return send_json(res, latest);
@@ -193,7 +199,7 @@ epv2.get('/conans/:package_name/:package_version/:package_username/:package_chan
 	}
 */
 async function epv2_files(req: Request, res: Response) {
-	var recipe_data_url = get_github_recipe_data_url(req);
+	var recipe_data_url = get_raw_github_recipe_data_url(req);
 	var files = await fetch_json(recipe_data_url + "/" + req.params.revision + "/files.json");
 	if (files != null) {
 		return send_json(res, files);
@@ -212,7 +218,7 @@ async function epv2_files_download(req: Request, res: Response) {
 	if (req.params.file === "conan_export.tgz") {
 		track_download(req);
 	}
-	var recipe_data_url = get_github_recipe_data_url(req);
+	var recipe_data_url = get_raw_github_recipe_data_url(req);
 	res.redirect(recipe_data_url + "/" + req.params.revision + "/files/" + req.params.file);
 }
 epv2.get('/conans/:package_name/:package_version/:package_username/:package_channel/revisions/:revision/files/:file', epv2_files_download);
@@ -227,15 +233,19 @@ epv2.get('*', epv2_error);
 
 // Utility..
 
-function get_github_recipe_base_url(req: Request) {
+function get_raw_github_recipe_data_url(req: Request) {
 	return "https://raw.githubusercontent.com/"
 		+ req.params.package_username + "/" + req.params.package_channel
 		+ "/barbarian/"
 		+ req.params.package_name + "/" + req.params.package_version;
 }
 
-function get_github_recipe_data_url(req: Request) {
-	return get_github_recipe_base_url(req);
+function get_self_github_recipe_files_url(req: Request, rev: string) {
+	return get_barbarian_base_url(req)
+		+ "/github/v2/conans"
+		+ "/" + req.params.package_name + "/" + req.params.package_version
+		+ "/" + req.params.package_username + "/" + req.params.package_channel
+		+ "/revisions/" + rev + "/files";
 }
 
 function send_json(res: Response, data: object) {
@@ -266,15 +276,25 @@ async function fetch_json(url: string) {
 	};
 }
 
-async function fetch_json_self(req: Request, path: string) {
-	return fetch_json(req.protocol + '://' + req.hostname + path);
+async function fetch_self_json(req: Request, path: string) {
+	return fetch_json(get_barbarian_base_url(req) + path);
+}
+
+async function fetch_github_recipe_latest_revision(req: Request, res: Response) {
+	var recipe_data_url = get_raw_github_recipe_data_url(req);
+	var latest = await fetch_json(recipe_data_url + "/latest.json");
+	if (latest != null) {
+		return latest["revision"];
+	}
+	else {
+		return null;
+	}
 }
 
 async function fetch_github_recipe_data_url_latest(req: Request, res: Response) {
-	var recipe_data_url = get_github_recipe_data_url(req);
-	var latest = await fetch_json(recipe_data_url + "/latest.json");
-	if (latest != null) {
-		return recipe_data_url + "/" + latest["revision"];
+	var latest_revision = await fetch_github_recipe_latest_revision(req, res);
+	if (latest_revision != null) {
+		return get_raw_github_recipe_data_url(req) + "/" + latest_revision;
 	}
 	else {
 		send_404(res);
@@ -282,7 +302,6 @@ async function fetch_github_recipe_data_url_latest(req: Request, res: Response) 
 	}
 }
 
-// mysql.createConnection(dbconf);
 var db_connection: mysql.Connection;
 
 function db() {
@@ -295,7 +314,7 @@ function db() {
 // Server..
 
 function log(req: Request, res: Response, next: any) {
-	console.log("[INFO] url = " + req.url + " params = " + JSON.stringify(req.params) + " query = " + JSON.stringify(req.query));
+	console.log("[INFO] url = " + get_barbarian_request_url(req) + " params = " + JSON.stringify(req.params) + " query = " + JSON.stringify(req.query));
 	console.log("[INFO] remote = " + (
 		req.connection.remoteAddress
 		|| req.socket.remoteAddress
@@ -337,6 +356,15 @@ function track_download(req: Request) {
 		});
 }
 
+function get_barbarian_base_url(req: Request) {
+	const { address, family, port } = server.address() as AddressInfo;
+	return req.protocol + "://" + address + ':' + port;
+}
+
+function get_barbarian_request_url(req: Request) {
+	return get_barbarian_base_url(req) + req.url;
+}
+
 const app = express();
 app.use(ExpressGA('UA-15160295-7'));
 app.use(express.json());
@@ -352,7 +380,6 @@ app.use("/github/v2", epv2);
 app.use(express.static(__dirname + '/static'));
 
 const server = app.listen(5000, '0.0.0.0', () => {
-	const { port, address } = server.address() as AddressInfo;
-	console.log('Server listening on:', 'http://' + address + ':' + port);
-}
-);
+	const { address, family, port } = server.address() as AddressInfo;
+	console.log('Server listening on:', 'http://' + address + ':' + port, 'family is', family);
+});
