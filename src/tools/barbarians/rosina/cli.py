@@ -191,8 +191,27 @@ DB_PASSWORD, DB_DATABASE.
             'barbarian', 'name', 'version', 'url', 'homepage', 'license', 'author',
             'description', 'topics', 'settings', 'options', 'default_options']
         package_remote = "barbarian-github"
+        conan_api.remote_add(
+            package_remote,
+            "https://barbarian.bfgroup.xyz/github",
+            force=True)
         package_info = conan_api.inspect(
             package_ref, package_attributes, package_remote)
+        # Extract description if it's from an export file.
+        if 'barbarian' in package_info and 'description' in package_info['barbarian'] and 'file' in package_info['barbarian']['description']:
+            description_file = package_info['barbarian']['description']['file']
+            try:
+                description_text, _ = conan_api.get_path(
+                    package_ref,
+                    path=description_file,
+                    remote_name=package_remote)
+                if description_text:
+                    package_info['barbarian']['description']['text'] = description_text
+                    print("[INFO] Obtained description text for package",
+                          package_ref, "from export file", description_file)
+            finally:
+                # Ignore errors from fetching description data?
+                pass
         return package_info
 
 
