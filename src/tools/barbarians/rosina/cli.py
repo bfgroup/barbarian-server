@@ -191,10 +191,10 @@ DB_PASSWORD, DB_DATABASE.
             'barbarian', 'name', 'version', 'url', 'homepage', 'license', 'author',
             'description', 'topics', 'settings', 'options', 'default_options']
         package_remote = "barbarian-github"
-        conan_api.remote_add(
-            package_remote,
-            "https://barbarian.bfgroup.xyz/github",
-            force=True)
+        # conan_api.remote_add(
+        #     package_remote,
+        #     "https://barbarian.bfgroup.xyz/github",
+        #     force=True)
         package_info = conan_api.inspect(
             package_ref, package_attributes, package_remote)
         # Extract description if it's from an export file.
