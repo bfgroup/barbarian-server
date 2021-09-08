@@ -13,8 +13,9 @@ html create.html : create.adoc ;
 html use.html : use.adoc ;
 html privacy.html : privacy.adoc ;
 html license.html : license.adoc ;
+html reference.html : reference.adoc ;
 
 install html
 	:	barbarian.css index.html home.html create.html use.html privacy.html
-		license.html
+		license.html reference.html
 	:	<location>../../../barbarian.bfgroup.xyz/static ;

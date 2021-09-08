@@ -3,6 +3,7 @@
 [.menu.text-left]
 * xref:use.adoc[Use]
 * xref:create.adoc[Create]
+* xref:reference.adoc[Reference]
 
 [.menu.text-center]
 * xref:home.adoc[Home]

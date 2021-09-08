@@ -1,0 +1,152 @@
+= xref:home.adoc[Barbarian]
+:copyright: Copyright 2021 René Ferdinand Rivera Morell
+:version-label!:
+:reproducible:
+:nofooter:
+:sectlinks:
+:linkcss:
+:stylesheet: barbarian.css
+:icons: font
+:caution-caption: ⚑
+:important-caption: ‼
+:note-caption: ℹ
+:tip-caption: ☀
+:warning-caption: ⚠
+:source-highlighter: rouge
+:rouge-style: bw
+
+== Reference
+
+=== Commands
+
+==== `barbarian new`
+
+[source,shell]
+```
+$ barbarian new
+    [-h] [--overwrite] [--recipe [{standalone,collection}]]
+    [--header-only] [--ci [{github}]]
+	reference
+```
+
+Creates a package recipe for the given `reference`. The information from the
+`reference`, i.e. name, version, user, and channel, is used to fill in some
+information in the generated template package recipe.
+
+```
+positional arguments:
+  reference             name/version@user/channel
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --overwrite           Overwrite existing files, if present,
+                        with new files.
+  --recipe [{standalone,collection}]
+                        The style of package recipe to
+                        generate, and flag to generate recipe.
+  --header-only         Create a header only package recipe.
+  --ci [{github}]       Create setup, i.e. scripts, for testing
+                        in CI for the given service.
+```
+
+Use `--overwrite` to skip creating fresh template files when it detects that you
+already have existing recipe files.
+
+The `--recipe` option specifies to generate a package recipe, and if given
+a value the style of recipe to generate. It defaults to `standalone`. For
+which it generates the package recipe in the current directory.
+
+The default is to generate a package recipe that has a `build` method and
+corresponding specification for a recipe that needs to build the library.
+You can use the `--header-only` flag option to generate a template for a
+library that doesn't need to be built.
+
+You can also use the `--ci` option to create CI setups that automatically build
+and check that your recipe works with various common compilers and
+configurations. You can also give a value for the CI system to create the
+configuration for. Although currently the only supported value is `github`,
+which is the default.
+
+NOTE: This does not create a `test_package` template.
+
+===== `conanfile.py`
+
+There are two basic templates: build-able and header-only. Both will work
+with the most common style of project structure where:
+
+* There's a `root/include` directory with headers files.
+* There's a `LICENSE.txt` file with the license text.
+* For the build template built files, both library and executables, are copied
+  from anywhere in the build tree.
+
+Barbarian recipes allow for a custom `barbarian` property. It contains extra
+information that is used for publishing the recipe in the Barbarian index
+(to be implemented soon) and for possible use in future inherited utility
+`python_requires` packages. The package recipe template specifies the extra
+field with some minimal information in it. The general structure of the field
+follows JSON object rules but written in Python. The currently supported
+specifications are:
+
+`description`:: Adds a long description that will be displayed in the index
+page for the project.
+
+`description/format`:: Subfield of `description` that indicates the kind of
+format the description text is in. Currently supported are: `asciidoc`.
+
+`description/text`:: The text for the long description in the format indicated
+in `description/format`.
+
+`description/file`:: You can also specify a file that contains the text. This
+is convenient if you already have some form of description file like a
+`README.adoc`. When using this method to specify the long description the
+given file also needs to be exported with the recipe by adding a
+`exports = "README.adoc"` Conan field. That way it will be included in the
+files uploaded to the `barbarian` branch for eventual use by the server
+indexing process.
+
+==== `barbarian export`
+
+[source,shell]
+```
+$ barbarian export
+    [-h]
+	path reference
+```
+
+Copies the package recipe files to the local work cache. The `barbarian` tool
+uses a Conan cache isolated from the regular cache. It puts this barbarian
+cache in the `github-root/.conan` directory. Once the recipe is in this cache
+it can be published.
+
+```
+positional arguments:
+  path                  Path to a folder containing a
+                        conanfile.py or to a recipe file e.g.,
+                        my_folder/conanfile.py
+  reference             Pkg/version@user/channel
+
+optional arguments:
+  -h, --help            show this help message and exit
+```
+
+==== `barbarian upload`
+
+[source,shell]
+```
+$ barbarian upload
+    [-h]
+    reference
+```
+
+Generates the recipe files, adds the recipe to the `barbarian` branch, and
+pushes the `barbarian` branch upstream.
+
+```
+positional arguments:
+  reference             Pkg/version@user/channel
+
+optional arguments:
+  -h, --help            show this help message and exit
+```
+
+include::footer.part.adoc[]

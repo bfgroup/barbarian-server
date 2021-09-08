@@ -18,7 +18,7 @@
 
 Getting to use packages from the services only needs to point the Conan client
 to the Barbarian Conan server. This Conan command will add the Barbarian
-service for GitHub stored packages to you local remotes:
+service for GitHub stored packages to your local remotes:
 
 [source,shell]
 ----

@@ -21,7 +21,7 @@
 
 Creating and publishing Conan packages for the Barbarian system is based on
 using a git repo as the storage for the exported recipe revisions of the
-package. That storage happens in a special, full isolated, branch of the
+package. That storage happens in a special, fully isolated, branch of the
 git repo (`barbarian`). The Barbarian Conan server then uses the recipe
 reference to find the repo and serve the recipe to users.
 
@@ -47,7 +47,7 @@ is required, unlike packages in Conan Center.
 
 To manage the aspects of creating and publishing Barbarian style Conan
 packages we use the `barbarian` tool. It behaves in a similar way to the
-`conan` too. So it should be fairly obvious how to use it if you already know
+`conan` tool. So it should be fairly obvious how to use it if you already know
 the `conan` tool. First step is to install the `barbarian` tool:
 
 [source,shell]
@@ -70,9 +70,9 @@ Standalone embedded package recipes are the easiest to manage if you only want
 to package your own library (or contribute directly to someone elses). For this
 the recipe information is stored directly in the git repo of the library.
 
-`*/conanfile.py`::
+`conanfile.py`::
 	The Conan package recipe.
-`*/conandata.yml`::
+`conandata.yml`::
 	_Optional_ specification for the library version sources.
 
 You can place the files anywhere you like in your git repo. The only
@@ -119,8 +119,8 @@ on the structure of a collection and the contents of the YAML (`*.yml`) files.
 Barbarian Conan package recipes follow the same structure of regular packages.
 But unlike Conan Center Index recipes, there are no restrictions to what you
 can do in them. With the one caveat that there are no binary packages cached.
-But to make things even easier there is a `barbarian new` tool to help you
-easily create simple package recipes to get you started.
+To make things easy there is a `barbarian new` tool to help you create simple
+package recipes to get you started.
 
 [source,shell]
 ----
@@ -153,7 +153,7 @@ recipe.
 In order for one to publish a Barbarian style package it's required to export
 the recipe package. In order to not pollute the global Conan recipe cache
 we use a special `barbarian export` command that places the package locally
-in a `<git-repo-root>/.conan` directory. Following with the previous
+in a `<git-repo-root>/.conan` directory. Continuing with the previous
 `test` recipe:
 
 [source,shell]
@@ -162,8 +162,10 @@ $ cd location/of/conanfile
 $ barbarian export . test/0.1.0@user/repo
 ----
 
-TIP: It's recommended to add `/.conan/` to your `.gitignore` root file to
-avoid accidentally adding this internal directory to git.
+TIP: The `barbarian new` command will also add `/.conan/` to your
+`.gitignore` file. Hence if you didn't use `conan new` It's recommended to add
+`/.conan/` manually to your `.gitignore` root file to avoid accidentally adding
+this internal directory to git.
 
 === Upload
 
