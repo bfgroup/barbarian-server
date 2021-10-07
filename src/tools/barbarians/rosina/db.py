@@ -125,8 +125,6 @@ class Project(Model):
     topic = TagsField(null=True)  # text
     # Normalized license of project.
     license = peewee.CharField(max_length=50, null=True)  # varchar(50)
-    # Combined count of package downloads through the Barbarian server.
-    downloads = peewee.BigIntegerField(default=0)  # bigint(20)
     # Latest package update date & time.
     updated = peewee.DateTimeField(null=True)  # datetime
     # Detailed information on the project.
@@ -152,9 +150,35 @@ class Package(Model):
     packager = peewee.CharField(max_length=30)  # varchar(30)
     # Detailed information on the package.
     info = JSONField(null=True)  # JSON
-    # Count of package downloads through the Barbarian server.
-    downloads = peewee.BigIntegerField(default=0)  # bigint(20)
 
     class Meta:
         primary_key = peewee.CompositeKey(
             'project', 'name', 'version', 'identity', 'packager')
+
+
+class Stat(Model):
+    """
+    Single entry for a package statistic value.
+    """
+    project = peewee.ForeignKeyField(
+        Project, backref="packages", column_name='project')  # bigint(20)
+    # Package name for the PDM.
+    package_name = peewee.CharField(max_length=100)  # varchar(100)
+    # Version in form needed for the package.
+    package_version = peewee.CharField(max_length=100)  # varchar(100)
+    # Optional identity to differentiate multiple packages of the same project
+    # in the same PDM. For Conan packages this would include the user, channel,
+    # and possibly the recipe revision.
+    package_identity = peewee.CharField(
+        max_length=300, null=True)  # varchar(300)
+    # The PDM for the package, only "Conan" so far.
+    packager = peewee.CharField(max_length=30)  # varchar(30)
+    # Time span that the stat applies to.
+    span_start = peewee.DateTimeField()  # datatime
+    span_end = peewee.DateTimeField()  # datatime
+    # The stat key ID.
+    stat = peewee.FixedCharField(max_length=4, choices=[
+        ('down', 'downloads')
+    ])  # char(4)
+    # The stat value, if it's a decimal.
+    value_i = peewee.BigIntegerField()  # bigint(20)

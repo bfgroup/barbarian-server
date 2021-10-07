@@ -4,7 +4,7 @@
 
 from argparse import ArgumentParser
 import datetime
-from .db import Database, Track, Project, Package
+from .db import Database, Track, Project, Package, Stat
 import peewee
 import conans.client.conan_api
 import semver
@@ -101,7 +101,7 @@ DB_PASSWORD, DB_DATABASE.
                         track_e.package_version,
                         track_e.package_identity,
                         self.pdm_conan)
-                    # Count the downloads for this package. Or move on to the next one.
+                    # Track the stats for this package. Or move on to the next one.
                     while track_e is not None:
                         if track_e.package_name != current_package.name or \
                                 track_e.package_version != current_package.version or \
@@ -109,7 +109,15 @@ DB_PASSWORD, DB_DATABASE.
                                 self.pdm_conan != current_package.packager:
                             break
                         else:
-                            current_package.downloads += 1
+                            stat = Stat.create(
+                                project=current_project,
+                                package_name=track_e.package_name,
+                                package_version=track_e.package_version,
+                                package_identity=track_e.package_identity,
+                                packager=self.pdm_conan,
+                                span_start=track_e.t, span_end=track_e.t,
+                                stat='down', value_i=1)
+                            stat.save()
                             track_e = next(track_i, None)
                     # We have the final updated count and info, save the changed package.
                     current_package.save()
