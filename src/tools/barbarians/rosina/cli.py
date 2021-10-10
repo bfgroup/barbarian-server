@@ -119,8 +119,6 @@ DB_PASSWORD, DB_DATABASE.
                                 stat='down', value_i=1)
                             stat.save()
                             track_e = next(track_i, None)
-                    # We have the final updated count and info, save the changed package.
-                    current_package.save()
                 # Refresh the data for the projects we encountered.
                 if not args.skip_project_refresh:
                     for project in projects.values():
