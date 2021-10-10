@@ -7,6 +7,7 @@
 
 [.menu.text-center]
 * xref:home.adoc[Home]
+* link:https://github.com/bfgroup/barbarian[Community]
 
 [.menu.text-right]
 * xref:privacy.adoc[Privacy]
