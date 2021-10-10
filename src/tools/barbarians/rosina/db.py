@@ -160,6 +160,7 @@ class Stat(Model):
     """
     Single entry for a package statistic value.
     """
+    id = peewee.BigIntegerField(primary_key=True)  # bigint(20)
     project = peewee.ForeignKeyField(
         Project, backref="packages", column_name='project')  # bigint(20)
     # Package name for the PDM.
