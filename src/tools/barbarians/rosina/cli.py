@@ -160,11 +160,6 @@ DB_PASSWORD, DB_DATABASE.
     def refresh_project(self, project):
         print("[INFO] Refresh project: {} #{}".format(
             project.name, project.id))
-        # Update the download count.
-        total_downloads = Package.select(peewee.fn.SUM(Package.downloads).alias(
-            'total_downloads')).where(Package.project == project.id).group_by(
-                Package.project).limit(1).namedtuples()[0].total_downloads
-        project.downloads = total_downloads
         # Find the current package, i.e. latest version, to obtain info from PDM.
         packages = Package.select().where(Package.project == project.id,
                                           Package.packager == self.pdm_conan)
