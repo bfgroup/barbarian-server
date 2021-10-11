@@ -8,7 +8,6 @@ http://www.boost.org/LICENSE_1_0.txt)
 using asciidoctor ;
 
 html index.html : index.adoc ;
-html home.html : home.adoc ;
 html create.html : create.adoc ;
 html use.html : use.adoc ;
 html privacy.html : privacy.adoc ;
@@ -16,6 +15,6 @@ html license.html : license.adoc ;
 html reference.html : reference.adoc ;
 
 install html
-	:	barbarian.css index.html home.html create.html use.html privacy.html
+	:	barbarian.css index.html create.html use.html privacy.html
 		license.html reference.html
 	:	<location>../../../barbarian.bfgroup.xyz/static ;

@@ -6,7 +6,7 @@
 * xref:reference.adoc[Reference]
 
 [.menu.text-center]
-* xref:home.adoc[Home]
+* xref:index.adoc[Home]
 * link:https://github.com/bfgroup/barbarian[Community]
 
 [.menu.text-right]

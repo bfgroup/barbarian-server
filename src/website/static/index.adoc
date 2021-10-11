@@ -1,4 +1,4 @@
-= Barbarian
+= xref:index.adoc[Barbarian]
 :copyright: Copyright 2021 René Ferdinand Rivera Morell
 :version-label!:
 :reproducible:
@@ -15,6 +15,86 @@
 :source-highlighter: rouge
 :rouge-style: bw
 
+[.text-center]
+The open, decentralized, distributed, easy, build from source Conan package
+index.
+
 == Welcome
 
-Welcome Barbarians!
+The Barbarian service collects and provides packages directly from git
+repositories as a distributed database of those packages.
+
+[source,shell]
+----
+$ conan remote add barbarian-github "https://barbarian.bfgroup.xyz/github"
+----
+
+[.panel]
+[#use]
+=== xref:use.adoc[Using Packages] ➜
+
+--
+*For users looking to install packages it can provide some advantages:*
+
+* Packages can come directly from the library authors.
+* Provide the latest versions of libraries.
+* Build from source to match your configuration.
+* Test your project with in-progress development versions to prepare for
+  future releases.
+
+*But there can be disadvantages:*
+
+* Packages are not curated.
+* There is no cache of binaries.
+
+Follow this xref:use.adoc[guide] to learn how to use the Barbarian Conan
+packages.
+--
+
+[.panel]
+[#create]
+=== xref:create.adoc[Creating Packages] ➜
+
+--
+*For package creators and library authors it can give some positives:*
+
+* Minimal effort package creation.
+* Can work with your existing git repo.
+* Provide packages that track in-progress development versions.
+
+*But there are negatives:*
+
+* Library authors are responsible for testing the package.
+* Which will add to your CI testing time.
+* Authors are responsible for responding to user requests of the package.
+
+Learn how to create and publish Barbarian Conan packages with this
+xref:create.adoc[guide].
+--
+
+== Present And Future
+
+The services are in an "Alpha" development state. Although we try and produce
+high quality software to provide the services there are bound to be problems.
+More important though is that being alpha entails that functionality can
+change, for better or worse, as we move towards a full production release.
+We will do our best to avoid disruptions, always.
+
+_As for the future, in no particular order.._
+
+* Currently we provide for packages published in link:https://github.com/[GitHub]
+  git repositories. But we plan to extend this to other publicly available git
+  providers like GitLab and Bitbucket.
+* With enough experience we will also look towards adding other Package and
+  Dependency Managers to the offering.
+* We will, hopefully soon, add a front end web search for the available packages
+  (you can use
+  link:https://docs.conan.io/en/latest/reference/commands/consumer/search.html[`conan search`]
+  as an alternative for now).
+* Which will include landing pages for the products and their packages.
+* We will be adding an API for others to build upon that will include all
+  information about packages, including access/download statistics.
+* Make the BSL-1.0 licensed source for the tools and services available for
+  contributions.
+
+include::footer.part.adoc[]
