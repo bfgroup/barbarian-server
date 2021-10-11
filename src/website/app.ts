@@ -57,8 +57,16 @@ epv1.get('/ping', epv1_ping);
 */
 async function epv1_snapshot(req: Request, res: Response) {
 	var recipe_data_url = await fetch_github_recipe_data_url_latest(req, res);
-	if (recipe_data_url != null)
-		res.redirect(recipe_data_url + "/snapshot.json");
+	if (recipe_data_url != null) {
+		var snapshot = await fetch_json(recipe_data_url + "/snapshot.json");
+		if (snapshot != null) {
+			return send_json(res, snapshot);
+		}
+		else {
+			send_404(res);
+			return;
+		}
+	}
 }
 epv1.get('/conans/:package_name/:package_version/:package_username/:package_channel', epv1_snapshot);
 
@@ -358,7 +366,12 @@ function track_download(req: Request) {
 
 function get_barbarian_base_url(req: Request) {
 	const { address, family, port } = server.address() as AddressInfo;
-	return req.protocol + "://" + address + ':' + port;
+	if (address != undefined) {
+		return req.protocol + "://" + address + ':' + port;
+	}
+	else {
+		return "https://barbarian.bfgroup.xyz";
+	}
 }
 
 function get_barbarian_request_url(req: Request) {
