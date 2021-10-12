@@ -166,16 +166,17 @@ DB_PASSWORD, DB_DATABASE.
         latest_version = "0"
         latest_package = None
         for package in packages:
-            if semver.gt(package.version, latest_version, True):
+            if semver.valid(package.version, True) and semver.gt(package.version, latest_version, True):
                 latest_version = package.version
                 latest_package = package
-        # Obtain the details package info from PDM.
-        package_info = self.obtain_conan_package_info(latest_package)
-        # Set project info from package.
-        project.description_brief = package_info['description']
-        project.topic = package_info['topics']
-        project.license = package_info['license']
-        project.info = package_info
+        if latest_package:
+            # Obtain the details package info from PDM.
+            package_info = self.obtain_conan_package_info(latest_package)
+            # Set project info from package.
+            project.description_brief = package_info['description']
+            project.topic = package_info['topics']
+            project.license = package_info['license']
+            project.info = package_info
         # Write out the updated project data.
         project.save()
 
