@@ -166,7 +166,7 @@ DB_PASSWORD, DB_DATABASE.
         latest_version = "0"
         latest_package = None
         for package in packages:
-            if semver.valid(package.version, True) and semver.gt(package.version, latest_version, True):
+            if semver.parse(package.version, True) and semver.gt(package.version, latest_version, True):
                 latest_version = package.version
                 latest_package = package
         if latest_package:
