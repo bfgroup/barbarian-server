@@ -1,6 +1,6 @@
 {
 	"name": "barbarian",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"description": "Barbarian is a Conan meta-server serving package recipes directly from GitHub repositories.",
 	"main": "barbarian.bfgroup.xyz/app.js",
 	"scripts": {

@@ -30,7 +30,6 @@ var epv1 = express.Router();
 async function epv1_noop(req: Request, res: Response) {
 	send_json(res, {});
 }
-epv1.get('/conans/search', epv1_noop);
 epv1.get('/conans/*/search', epv1_noop);
 epv1.get('/conans/*/upload_urls', epv1_noop);
 
@@ -44,6 +43,14 @@ async function epv1_ping(req: Request, res: Response) {
 	});
 }
 epv1.get('/ping', epv1_ping);
+
+/*
+	The root search is the same as the v2 search.
+*/
+async function epv1_search(req: Request, res: Response) {
+	return await epv2_search(req, res);
+}
+epv1.get('/conans/search', epv1_search);
 
 /*
 	Returns the snapshot of the recipe files for the specified Conan recipe. The snapshot is a list of filenames with their associated md5 hash.
