@@ -371,10 +371,18 @@ function track_download(req: Request) {
 		});
 }
 
+const server_name = /[/]([a-z]+[.]bfgroup[.]xyz)/g.exec(__dirname);
+if (server_name != null) {
+	console.log('Server Name:', server_name[1]);
+}
+
 function get_barbarian_base_url(req: Request) {
 	const { address, family, port } = server.address() as AddressInfo;
 	if (address != undefined) {
 		return req.protocol + "://" + address + ':' + port;
+	}
+	else if (server_name != null) {
+		return "https://" + server_name[1];
 	}
 	else {
 		return "https://barbarian.bfgroup.xyz";
@@ -403,3 +411,4 @@ const server = app.listen(5000, '0.0.0.0', () => {
 	const { address, family, port } = server.address() as AddressInfo;
 	console.log('Server listening on:', 'http://' + address + ':' + port, 'family is', family);
 });
+

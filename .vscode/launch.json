@@ -1,11 +1,24 @@
 {
 	"configurations": [
 		{
-			"name": "Launch via NPM",
+			"name": "Launch Barbarian",
 			"request": "launch",
 			"runtimeArgs": [
 				"run-script",
-				"start"
+				"start_barbarian"
+			],
+			"runtimeExecutable": "npm",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "pwa-node"
+		},
+		{
+			"name": "Launch Jenna",
+			"request": "launch",
+			"runtimeArgs": [
+				"run-script",
+				"start_jenna"
 			],
 			"runtimeExecutable": "npm",
 			"skipFiles": [

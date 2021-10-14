@@ -6,7 +6,26 @@ http://www.boost.org/LICENSE_1_0.txt)
 |#
 
 import project ;
+import property ;
 
 project /bfg_barbarian : build-dir .bin ;
 
-alias doc : src/website/static//html ;
+make barbarian
+	:	[ glob src/website/*.ts ] tsconfig.json
+	:	@tsc
+	:	<variant>release:<flags>"--outDir barbarian.bfgroup.xyz"
+		<variant>debug:<flags>"--outDir jenna.bfgroup.xyz"
+		<dependency>src/website/static//html
+		<relevant>variant
+	;
+
+rule tsc ( targets + : sources * : props * )
+{
+	local flags = [ property.select <flags> : $(props) ] ;
+	FLAGS on $(targets) = $(flags:G=) ;
+}
+
+actions tsc
+{
+	tsc $(FLAGS) && echo "." > "$(<)"
+}

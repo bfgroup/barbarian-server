@@ -17,4 +17,6 @@ html reference.html : reference.adoc ;
 install html
 	:	barbarian.css index.html create.html use.html privacy.html
 		license.html reference.html
-	:	<location>../../../barbarian.bfgroup.xyz/static ;
+	:	<variant>debug:<location>../../../jenna.bfgroup.xyz/static
+		<variant>release:<location>../../../barbarian.bfgroup.xyz/static
+	;
