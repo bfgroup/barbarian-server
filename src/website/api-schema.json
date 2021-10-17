@@ -1,0 +1,372 @@
+{
+	"openapi": "3.0.2",
+	"info": {
+		"title": "Barbarian Package Index",
+		"version": "0.1.0",
+		"license": {
+			"name": "BSL-1.0",
+			"url": "https://www.boost.org/LICENSE_1_0.txt"
+		},
+		"description": "Provides information for packages available through the Barbarian service.",
+		"contact": {
+			"name": "René Ferdinand Rivera Morell"
+		}
+	},
+	"servers": [
+		{
+			"url": "https://barbarian.bfgroup.xyz/corum",
+			"description": "Provides information on C++ packages."
+		},
+		{
+			"url": "https://jenna.bfgroup.xyz/corum",
+			"description": "Provides information on C++ packages."
+		}
+	],
+	"components": {
+		"schemas": {
+			"product_min_list": {
+				"description": "Range, i.e. window, of brief products.",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/product_min"
+					},
+					{
+						"$ref": "#/components/schemas/range"
+					}
+				]
+			},
+			"range": {
+				"type": "object",
+				"required": [
+					"start",
+					"count",
+					"total"
+				],
+				"properties": {
+					"start": {
+						"type": "integer",
+						"format": "int64",
+						"minimum": 0
+					},
+					"count": {
+						"type": "integer",
+						"format": "int64",
+						"minimum": 0
+					},
+					"total": {
+						"type": "integer",
+						"format": "int64",
+						"minimum": 0
+					}
+				}
+			},
+			"error": {
+				"type": "object",
+				"required": [
+					"code",
+					"message"
+				],
+				"properties": {
+					"code": {
+						"description": "Numeric error code.",
+						"type": "integer",
+						"format": "int32"
+					},
+					"message": {
+						"description": "Human readable reason for error.",
+						"type": "string"
+					}
+				}
+			},
+			"meta": {
+				"description": "Information about the server and API.",
+				"type": "object",
+				"required": [
+					"api_version",
+					"stability"
+				],
+				"properties": {
+					"api_version": {
+						"description": "The version of the API.",
+						"type": "string"
+					},
+					"stability": {
+						"description": "If this is a release stable API, or in-development.",
+						"type": "string",
+						"enum": [
+							"release",
+							"dev"
+						]
+					}
+				}
+			},
+			"description": {
+				"description": "Full, aka long, description.",
+				"type": "object",
+				"required": [
+					"text",
+					"format"
+				],
+				"properties": {
+					"text": {
+						"description": "Format specific text content of the description.",
+						"type": "string",
+						"nullable": true
+					},
+					"format": {
+						"description": "The format of the description text.",
+						"type": "string",
+						"nullable": true,
+						"enum": [
+							"asciidoc",
+							"markdown"
+						]
+					}
+				}
+			},
+			"product_min": {
+				"type": "object",
+				"required": [
+					"id",
+					"name"
+				],
+				"properties": {
+					"id": {
+						"description": "Numeric unique identifier for project.",
+						"type": "integer",
+						"format": "int64",
+						"minimum": 0
+					},
+					"name": {
+						"description": "Unique symbolic name for project.",
+						"type": "string",
+						"maxLength": 100
+					},
+					"description_brief": {
+						"description": "Brief text description of the project.",
+						"type": "string",
+						"nullable": true
+					},
+					"topic": {
+						"description": "Individual topical tags for the project.",
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"nullable": true
+					},
+					"license": {
+						"description": "License that applies to the project.",
+						"type": "string",
+						"maxLength": 50,
+						"nullable": true
+					}
+				}
+			},
+			"product_full": {
+				"type": "object",
+				"required": [
+					"id",
+					"name"
+				],
+				"properties": {
+					"id": {
+						"description": "Numeric unique identifier for project.",
+						"type": "integer",
+						"format": "int64",
+						"minimum": 0
+					},
+					"name": {
+						"description": "Unique symbolic name for project.",
+						"type": "string",
+						"maxLength": 100
+					},
+					"description_brief": {
+						"description": "Brief text description of the project.",
+						"type": "string",
+						"nullable": true
+					},
+					"topic": {
+						"description": "Individual topical tags for the project.",
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"nullable": true
+					},
+					"license": {
+						"description": "License that applies to the project.",
+						"type": "string",
+						"maxLength": 50,
+						"nullable": true
+					},
+					"updated": {
+						"description": "Most recent date when a package for the project was published.",
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"homepage": {
+						"description": "URL pointing to the project.",
+						"type": "string",
+						"nullable": true
+					},
+					"author": {
+						"description": "Primary author name of the project.",
+						"type": "string",
+						"nullable": true
+					},
+					"description_long": {
+						"description": "Full, aka long, formatted description of the project.",
+						"$ref": "#/components/schemas/description"
+					}
+				}
+			}
+		},
+		"responses": {
+			"product_min_list": {
+				"description": "Range of brief products.",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/product_min_list"
+						}
+					}
+				}
+			},
+			"error": {
+				"description": "Error",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/error"
+						}
+					}
+				}
+			}
+		},
+		"parameters": {
+			"tags": {
+				"name": "tags",
+				"in": "query",
+				"required": true,
+				"description": "Set of tags to search.",
+				"style": "pipeDelimited",
+				"schema": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			},
+			"product_id": {
+				"name": "product_id",
+				"in": "path",
+				"required": true,
+				"description": "The numerical ID of the product.",
+				"schema": {
+					"type": "integer",
+					"format": "int64"
+				}
+			}
+		}
+	},
+	"paths": {
+		"/search/tag": {
+			"get": {
+				"description": "Search products with at least one of the tags.",
+				"operationId": "search_by_tag",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/tags"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"$ref": "#/components/responses/product_min_list"
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				}
+			}
+		},
+		"/meta": {
+			"get": {
+				"description": "Information on the server and the API.",
+				"operationId": "meta",
+				"parameters": [],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/meta"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				}
+			}
+		},
+		"/product/full/{product_id}": {
+			"get": {
+				"summary": "Product by ID.",
+				"description": "Get identified project full information.",
+				"operationId": "get_product_full_by_id",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/product_id"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/product_full"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				}
+			}
+		},
+		"/product/min/{product_id}": {
+			"get": {
+				"summary": "Product by ID.",
+				"description": "Get identified project basic information.",
+				"operationId": "get_product_min_by_id",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/product_id"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/product_min"
+								}
+							}
+						}
+					},
+					"default": {
+						"$ref": "#/components/responses/error"
+					}
+				}
+			}
+		}
+	}
+}

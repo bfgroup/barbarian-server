@@ -4,8 +4,33 @@ Distributed under the Boost Software License, Version 1.0.
 (See accompanying file LICENSE_1_0.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
 |#
+import property ;
+import common ;
+import stage ;
 
 using asciidoctor ;
+
+
+rule openapi-asciidoc ( targets + : sources * : props * )
+{
+	local flags = [ property.select <flags> : $(props) ] ;
+	FLAGS on $(targets) = $(flags:G=) ;
+}
+
+actions openapi-asciidoc
+{
+	npx @openapitools/openapi-generator-cli generate -i "$(>)" -g asciidoc -o "$(<:D)" $(FLAGS)
+	mv "$(<:B=index)" "$(<)"
+}
+
+make api.gen.adoc : ../api-schema.json : @openapi-asciidoc
+	:	<flags>--additional-properties=headerAttributes=false
+		<flags>--additional-properties=useIntroduction=true
+		<flags>--additional-properties=useTableTitles=true
+		# <flags>--additional-properties=useMethodAndPath=true
+	;
+
+install api-gen : api.gen.adoc : <location>. ;
 
 html index.html : index.adoc ;
 html create.html : create.adoc ;
@@ -13,10 +38,11 @@ html use.html : use.adoc ;
 html privacy.html : privacy.adoc ;
 html license.html : license.adoc ;
 html reference.html : reference.adoc ;
+html api.html : api.adoc : <dependency>api-gen ;
 
 install html
-	:	barbarian.css index.html create.html use.html privacy.html
-		license.html reference.html
+	:	barbarian.css index.html create.html use.html privacy.html api.html
+		license.html reference.html ../api-schema.json
 	:	<variant>debug:<location>../../../jenna.bfgroup.xyz/static
 		<variant>release:<location>../../../barbarian.bfgroup.xyz/static
 	;

@@ -5,3 +5,4 @@
 /package-lock.json
 /.dbconf.*
 __pycache__
+openapitools.json

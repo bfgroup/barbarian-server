@@ -1,0 +1,30 @@
+= xref:index.adoc[Barbarian]
+:copyright: Copyright 2021 René Ferdinand Rivera Morell
+:version-label!:
+:reproducible:
+:nofooter:
+:sectlinks:
+:toc: left
+:toclevels: 4
+:linkcss:
+:stylesheet: barbarian.css
+:icons: font
+:caution-caption: ⚑
+:important-caption: ‼
+:note-caption: ℹ
+:tip-caption: ☀
+:warning-caption: ⚠
+:source-highlighter: rouge
+:rouge-style: bw
+
+include::api.gen.adoc[leveloffset=1]
+
+=== Schema
+
+This documentation is produced from the
+link:https://swagger.io/specification/[OpenAPI] schema. The documentation is
+not a fully accurate specification. You can consult the fully accurate
+link:api-schema.json[schema specification] for details and to aid in your
+own generation of code.
+
+include::footer.part.adoc[]

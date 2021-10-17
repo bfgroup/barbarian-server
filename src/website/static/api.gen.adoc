@@ -1,0 +1,633 @@
+= Barbarian Package Index
+
+== Introduction
+Provides information for packages available through the Barbarian service.
+
+
+// markup not found, no include::{specDir}intro.adoc[opts=optional]
+
+
+
+== Endpoints
+
+
+[.Default]
+=== Default
+
+
+[.getProductFullById]
+==== getProductFullById
+    
+`GET /product/full/{product_id}`
+
+Product by ID.
+
+===== Description 
+
+Get identified project full information.
+
+
+// markup not found, no include::{specDir}product/full/\{product_id\}/GET/spec.adoc[opts=optional]
+
+
+
+===== Parameters
+
+
+[cols="2,3,1,1,1"]
+.Path Parameters
+|===         
+|Name| Description| Required| Default| Pattern
+
+| product_id 
+| The numerical ID of the product.  
+| X 
+| null 
+|  
+
+|===         
+
+
+
+
+
+
+===== Return Type
+
+<<product_full>>
+
+
+===== Content Type
+
+* application/json
+
+===== Responses
+
+.http response codes
+[cols="2,3,1"]
+|===         
+| Code | Message | Datatype 
+
+
+| 200
+| OK
+|  <<product_full>>
+
+
+| 0
+| Error
+|  <<error>>
+
+|===         
+
+===== Samples
+
+
+// markup not found, no include::{snippetDir}product/full/\{product_id\}/GET/http-request.adoc[opts=optional]
+
+
+// markup not found, no include::{snippetDir}product/full/\{product_id\}/GET/http-response.adoc[opts=optional]
+
+
+
+// file not found, no * wiremock data link :product/full/{product_id}/GET/GET.json[]
+
+
+ifdef::internal-generation[]
+===== Implementation
+
+// markup not found, no include::{specDir}product/full/\{product_id\}/GET/implementation.adoc[opts=optional]
+
+
+endif::internal-generation[]
+
+
+[.getProductMinById]
+==== getProductMinById
+    
+`GET /product/min/{product_id}`
+
+Product by ID.
+
+===== Description 
+
+Get identified project basic information.
+
+
+// markup not found, no include::{specDir}product/min/\{product_id\}/GET/spec.adoc[opts=optional]
+
+
+
+===== Parameters
+
+
+[cols="2,3,1,1,1"]
+.Path Parameters
+|===         
+|Name| Description| Required| Default| Pattern
+
+| product_id 
+| The numerical ID of the product.  
+| X 
+| null 
+|  
+
+|===         
+
+
+
+
+
+
+===== Return Type
+
+<<product_min>>
+
+
+===== Content Type
+
+* application/json
+
+===== Responses
+
+.http response codes
+[cols="2,3,1"]
+|===         
+| Code | Message | Datatype 
+
+
+| 200
+| OK
+|  <<product_min>>
+
+
+| 0
+| Error
+|  <<error>>
+
+|===         
+
+===== Samples
+
+
+// markup not found, no include::{snippetDir}product/min/\{product_id\}/GET/http-request.adoc[opts=optional]
+
+
+// markup not found, no include::{snippetDir}product/min/\{product_id\}/GET/http-response.adoc[opts=optional]
+
+
+
+// file not found, no * wiremock data link :product/min/{product_id}/GET/GET.json[]
+
+
+ifdef::internal-generation[]
+===== Implementation
+
+// markup not found, no include::{specDir}product/min/\{product_id\}/GET/implementation.adoc[opts=optional]
+
+
+endif::internal-generation[]
+
+
+[.meta]
+==== meta
+    
+`GET /meta`
+
+
+
+===== Description 
+
+Information on the server and the API.
+
+
+// markup not found, no include::{specDir}meta/GET/spec.adoc[opts=optional]
+
+
+
+===== Parameters
+
+
+
+
+
+
+
+===== Return Type
+
+<<meta>>
+
+
+===== Content Type
+
+* application/json
+
+===== Responses
+
+.http response codes
+[cols="2,3,1"]
+|===         
+| Code | Message | Datatype 
+
+
+| 200
+| OK
+|  <<meta>>
+
+
+| 0
+| Error
+|  <<error>>
+
+|===         
+
+===== Samples
+
+
+// markup not found, no include::{snippetDir}meta/GET/http-request.adoc[opts=optional]
+
+
+// markup not found, no include::{snippetDir}meta/GET/http-response.adoc[opts=optional]
+
+
+
+// file not found, no * wiremock data link :meta/GET/GET.json[]
+
+
+ifdef::internal-generation[]
+===== Implementation
+
+// markup not found, no include::{specDir}meta/GET/implementation.adoc[opts=optional]
+
+
+endif::internal-generation[]
+
+
+[.searchByTag]
+==== searchByTag
+    
+`GET /search/tag`
+
+
+
+===== Description 
+
+Search products with at least one of the tags.
+
+
+// markup not found, no include::{specDir}search/tag/GET/spec.adoc[opts=optional]
+
+
+
+===== Parameters
+
+
+
+
+
+
+[cols="2,3,1,1,1"]
+.Query Parameters
+|===         
+|Name| Description| Required| Default| Pattern
+
+| tags 
+| Set of tags to search. <<String>> 
+| X 
+| null 
+|  
+
+|===         
+
+
+===== Return Type
+
+<<product_min_list>>
+
+
+===== Content Type
+
+* application/json
+
+===== Responses
+
+.http response codes
+[cols="2,3,1"]
+|===         
+| Code | Message | Datatype 
+
+
+| 200
+| Range of brief products.
+|  <<product_min_list>>
+
+
+| 0
+| Error
+|  <<error>>
+
+|===         
+
+===== Samples
+
+
+// markup not found, no include::{snippetDir}search/tag/GET/http-request.adoc[opts=optional]
+
+
+// markup not found, no include::{snippetDir}search/tag/GET/http-response.adoc[opts=optional]
+
+
+
+// file not found, no * wiremock data link :search/tag/GET/GET.json[]
+
+
+ifdef::internal-generation[]
+===== Implementation
+
+// markup not found, no include::{specDir}search/tag/GET/implementation.adoc[opts=optional]
+
+
+endif::internal-generation[]
+
+
+[#models]
+== Models
+
+
+[#Description]
+=== _Description_ 
+
+Full, aka long, description.
+
+[.fields-Description]
+[cols="2,1,2,4,1"]
+|===         
+| Field Name| Required| Type| Description| Format
+
+| text 
+| X 
+| String  
+| Format specific text content of the description.
+|  
+
+| format 
+| X 
+| String  
+| The format of the description text.
+|  _Enum:_ asciidoc, markdown, 
+
+|===
+
+
+[#Error]
+=== _Error_ 
+
+
+
+[.fields-Error]
+[cols="2,1,2,4,1"]
+|===         
+| Field Name| Required| Type| Description| Format
+
+| code 
+| X 
+| Integer  
+| Numeric error code.
+| int32 
+
+| message 
+| X 
+| String  
+| Human readable reason for error.
+|  
+
+|===
+
+
+[#Meta]
+=== _Meta_ 
+
+Information about the server and API.
+
+[.fields-Meta]
+[cols="2,1,2,4,1"]
+|===         
+| Field Name| Required| Type| Description| Format
+
+| api_version 
+| X 
+| String  
+| The version of the API.
+|  
+
+| stability 
+| X 
+| String  
+| If this is a release stable API, or in-development.
+|  _Enum:_ release, dev, 
+
+|===
+
+
+[#ProductFull]
+=== _ProductFull_ 
+
+
+
+[.fields-ProductFull]
+[cols="2,1,2,4,1"]
+|===         
+| Field Name| Required| Type| Description| Format
+
+| id 
+| X 
+| Long  
+| Numeric unique identifier for project.
+| int64 
+
+| name 
+| X 
+| String  
+| Unique symbolic name for project.
+|  
+
+| description_brief 
+|  
+| String  
+| Brief text description of the project.
+|  
+
+| topic 
+|  
+| List  of <<string>> 
+| Individual topical tags for the project.
+|  
+
+| license 
+|  
+| String  
+| License that applies to the project.
+|  
+
+| updated 
+|  
+| Date  
+| Most recent date when a package for the project was published.
+| date-time 
+
+| homepage 
+|  
+| String  
+| URL pointing to the project.
+|  
+
+| author 
+|  
+| String  
+| Primary author name of the project.
+|  
+
+| description_long 
+|  
+| description  
+| 
+|  
+
+|===
+
+
+[#ProductMin]
+=== _ProductMin_ 
+
+
+
+[.fields-ProductMin]
+[cols="2,1,2,4,1"]
+|===         
+| Field Name| Required| Type| Description| Format
+
+| id 
+| X 
+| Long  
+| Numeric unique identifier for project.
+| int64 
+
+| name 
+| X 
+| String  
+| Unique symbolic name for project.
+|  
+
+| description_brief 
+|  
+| String  
+| Brief text description of the project.
+|  
+
+| topic 
+|  
+| List  of <<string>> 
+| Individual topical tags for the project.
+|  
+
+| license 
+|  
+| String  
+| License that applies to the project.
+|  
+
+|===
+
+
+[#ProductMinList]
+=== _ProductMinList_ 
+
+Range, i.e. window, of brief products.
+
+[.fields-ProductMinList]
+[cols="2,1,2,4,1"]
+|===         
+| Field Name| Required| Type| Description| Format
+
+| id 
+| X 
+| Long  
+| Numeric unique identifier for project.
+| int64 
+
+| name 
+| X 
+| String  
+| Unique symbolic name for project.
+|  
+
+| description_brief 
+|  
+| String  
+| Brief text description of the project.
+|  
+
+| topic 
+|  
+| List  of <<string>> 
+| Individual topical tags for the project.
+|  
+
+| license 
+|  
+| String  
+| License that applies to the project.
+|  
+
+| start 
+| X 
+| Long  
+| 
+| int64 
+
+| count 
+| X 
+| Long  
+| 
+| int64 
+
+| total 
+| X 
+| Long  
+| 
+| int64 
+
+|===
+
+
+[#Range]
+=== _Range_ 
+
+
+
+[.fields-Range]
+[cols="2,1,2,4,1"]
+|===         
+| Field Name| Required| Type| Description| Format
+
+| start 
+| X 
+| Long  
+| 
+| int64 
+
+| count 
+| X 
+| Long  
+| 
+| int64 
+
+| total 
+| X 
+| Long  
+| 
+| int64 
+
+|===
+
+
