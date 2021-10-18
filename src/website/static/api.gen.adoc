@@ -24,7 +24,7 @@ Product by ID.
 
 ===== Description 
 
-Get identified project full information.
+Get identified project full information. (<<ProductFull>>)
 
 
 // markup not found, no include::{specDir}product/full/\{product_id\}/GET/spec.adoc[opts=optional]
@@ -75,7 +75,7 @@ Get identified project full information.
 
 
 | 0
-| Error
+| Error information. (&lt;&lt;Error&gt;&gt;)
 |  <<error>>
 
 |===         
@@ -111,7 +111,7 @@ Product by ID.
 
 ===== Description 
 
-Get identified project basic information.
+Get identified project basic information. (<<ProductMin>>)
 
 
 // markup not found, no include::{specDir}product/min/\{product_id\}/GET/spec.adoc[opts=optional]
@@ -162,7 +162,7 @@ Get identified project basic information.
 
 
 | 0
-| Error
+| Error information. (&lt;&lt;Error&gt;&gt;)
 |  <<error>>
 
 |===         
@@ -198,7 +198,7 @@ endif::internal-generation[]
 
 ===== Description 
 
-Information on the server and the API.
+Information on the server and the API. (<<Meta>>)
 
 
 // markup not found, no include::{specDir}meta/GET/spec.adoc[opts=optional]
@@ -236,7 +236,7 @@ Information on the server and the API.
 
 
 | 0
-| Error
+| Error information. (&lt;&lt;Error&gt;&gt;)
 |  <<error>>
 
 |===         
@@ -263,19 +263,19 @@ ifdef::internal-generation[]
 endif::internal-generation[]
 
 
-[.searchByTag]
-==== searchByTag
+[.search]
+==== search
     
-`GET /search/tag`
+`GET /search`
 
 
 
 ===== Description 
 
-Search products with at least one of the tags.
+Search products with at least one of the words. (<<ProductMinList>))
 
 
-// markup not found, no include::{specDir}search/tag/GET/spec.adoc[opts=optional]
+// markup not found, no include::{specDir}search/GET/spec.adoc[opts=optional]
 
 
 
@@ -291,9 +291,15 @@ Search products with at least one of the tags.
 |===         
 |Name| Description| Required| Default| Pattern
 
-| tags 
-| Set of tags to search. <<String>> 
+| words 
+| Set of words to search, separated by the pipe symbol. <<String>> 
 | X 
+| null 
+|  
+
+| search 
+| Options to control what kind of search to do. &lt;&lt;SearchOptions&gt;&gt;  
+| - 
 | null 
 |  
 
@@ -318,12 +324,12 @@ Search products with at least one of the tags.
 
 
 | 200
-| Range of brief products.
+| Range of brief products. This is a sub-region of a list of &lt;&lt;ProductMin&gt;&gt; objects.
 |  <<product_min_list>>
 
 
 | 0
-| Error
+| Error information. (&lt;&lt;Error&gt;&gt;)
 |  <<error>>
 
 |===         
@@ -331,20 +337,20 @@ Search products with at least one of the tags.
 ===== Samples
 
 
-// markup not found, no include::{snippetDir}search/tag/GET/http-request.adoc[opts=optional]
+// markup not found, no include::{snippetDir}search/GET/http-request.adoc[opts=optional]
 
 
-// markup not found, no include::{snippetDir}search/tag/GET/http-response.adoc[opts=optional]
+// markup not found, no include::{snippetDir}search/GET/http-response.adoc[opts=optional]
 
 
 
-// file not found, no * wiremock data link :search/tag/GET/GET.json[]
+// file not found, no * wiremock data link :search/GET/GET.json[]
 
 
 ifdef::internal-generation[]
 ===== Implementation
 
-// markup not found, no include::{specDir}search/tag/GET/implementation.adoc[opts=optional]
+// markup not found, no include::{specDir}search/GET/implementation.adoc[opts=optional]
 
 
 endif::internal-generation[]
@@ -627,6 +633,31 @@ Range, i.e. window, of brief products.
 | Long  
 | 
 | int64 
+
+|===
+
+
+[#SearchOptions]
+=== _SearchOptions_ 
+
+Options to control what kind of search to do.
+
+[.fields-SearchOptions]
+[cols="2,1,2,4,1"]
+|===         
+| Field Name| Required| Type| Description| Format
+
+| in_tags 
+|  
+| Boolean  
+| Search in the tags, if applicable. Defaults to &#39;false&#39;.
+|  
+
+| in_description 
+|  
+| Boolean  
+| Search in descriptions, if applicable. Defaults to &#39;true&#39;
+|  
 
 |===
 

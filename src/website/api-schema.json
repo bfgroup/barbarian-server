@@ -24,6 +24,22 @@
 	],
 	"components": {
 		"schemas": {
+			"search_options": {
+				"type": "object",
+				"description": "Options to control what kind of search to do.",
+				"properties": {
+					"in_tags": {
+						"description": "Search in the tags, if applicable. Defaults to 'false'.",
+						"type": "boolean",
+						"default": false
+					},
+					"in_description": {
+						"description": "Search in descriptions, if applicable. Defaults to 'true'",
+						"type": "boolean",
+						"default": true
+					}
+				}
+			},
 			"product_min_list": {
 				"description": "Range, i.e. window, of brief products.",
 				"allOf": [
@@ -225,7 +241,7 @@
 		},
 		"responses": {
 			"product_min_list": {
-				"description": "Range of brief products.",
+				"description": "Range of brief products. This is a sub-region of a list of <<ProductMin>> objects.",
 				"content": {
 					"application/json": {
 						"schema": {
@@ -235,7 +251,7 @@
 				}
 			},
 			"error": {
-				"description": "Error",
+				"description": "Error information. (<<Error>>)",
 				"content": {
 					"application/json": {
 						"schema": {
@@ -246,11 +262,22 @@
 			}
 		},
 		"parameters": {
-			"tags": {
-				"name": "tags",
+			"search_options": {
+				"name": "search",
+				"in": "query",
+				"required": false,
+				"description": "Options to control what kind of search to do. <<SearchOptions>>",
+				"style": "form",
+				"explode": true,
+				"schema": {
+					"$ref": "#/components/schemas/search_options"
+				}
+			},
+			"words": {
+				"name": "words",
 				"in": "query",
 				"required": true,
-				"description": "Set of tags to search.",
+				"description": "Set of words to search, separated by the pipe symbol.",
 				"style": "pipeDelimited",
 				"schema": {
 					"type": "array",
@@ -272,13 +299,16 @@
 		}
 	},
 	"paths": {
-		"/search/tag": {
+		"/search": {
 			"get": {
-				"description": "Search products with at least one of the tags.",
-				"operationId": "search_by_tag",
+				"description": "Search products with at least one of the words. (<<ProductMinList>))",
+				"operationId": "search",
 				"parameters": [
 					{
-						"$ref": "#/components/parameters/tags"
+						"$ref": "#/components/parameters/words"
+					},
+					{
+						"$ref": "#/components/parameters/search_options"
 					}
 				],
 				"responses": {
@@ -294,7 +324,7 @@
 		},
 		"/meta": {
 			"get": {
-				"description": "Information on the server and the API.",
+				"description": "Information on the server and the API. (<<Meta>>)",
 				"operationId": "meta",
 				"parameters": [],
 				"responses": {
@@ -317,7 +347,7 @@
 		"/product/full/{product_id}": {
 			"get": {
 				"summary": "Product by ID.",
-				"description": "Get identified project full information.",
+				"description": "Get identified project full information. (<<ProductFull>>)",
 				"operationId": "get_product_full_by_id",
 				"parameters": [
 					{
@@ -344,7 +374,7 @@
 		"/product/min/{product_id}": {
 			"get": {
 				"summary": "Product by ID.",
-				"description": "Get identified project basic information.",
+				"description": "Get identified project basic information. (<<ProductMin>>)",
 				"operationId": "get_product_min_by_id",
 				"parameters": [
 					{
