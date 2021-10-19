@@ -23,7 +23,7 @@ actions openapi-asciidoc
 	mv "$(<:B=index)" "$(<)"
 }
 
-make api.gen.adoc : ../api-schema.json : @openapi-asciidoc
+make api.gen.adoc : ../corum.json : @openapi-asciidoc
 	:	<flags>--additional-properties=headerAttributes=false
 		<flags>--additional-properties=useIntroduction=true
 		<flags>--additional-properties=useTableTitles=true
@@ -42,7 +42,7 @@ html api.html : api.adoc : <dependency>api-gen ;
 
 install html
 	:	barbarian.css index.html create.html use.html privacy.html api.html
-		license.html reference.html ../api-schema.json
+		license.html reference.html ../corum.json
 	:	<variant>debug:<location>../../../jenna.bfgroup.xyz/static
 		<variant>release:<location>../../../barbarian.bfgroup.xyz/static
 	;

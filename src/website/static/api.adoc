@@ -24,7 +24,7 @@ include::api.gen.adoc[leveloffset=1]
 This documentation is produced from the
 link:https://swagger.io/specification/[OpenAPI] schema. The documentation is
 not a fully accurate specification. You can consult the fully accurate
-link:api-schema.json[schema specification] for details and to aid in your
+link:corum.json[schema specification] for details and to aid in your
 own generation of code.
 
 include::footer.part.adoc[]
