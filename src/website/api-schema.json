@@ -299,10 +299,13 @@
 		}
 	},
 	"paths": {
-		"/search": {
+		"/product/search": {
 			"get": {
 				"description": "Search products with at least one of the words. (<<ProductMinList>))",
-				"operationId": "search",
+				"operationId": "product_search",
+				"tags": [
+					"product"
+				],
 				"parameters": [
 					{
 						"$ref": "#/components/parameters/words"
@@ -326,6 +329,9 @@
 			"get": {
 				"description": "Information on the server and the API. (<<Meta>>)",
 				"operationId": "meta",
+				"tags": [
+					"server"
+				],
 				"parameters": [],
 				"responses": {
 					"200": {
@@ -348,6 +354,9 @@
 			"get": {
 				"summary": "Product by ID.",
 				"description": "Get identified project full information. (<<ProductFull>>)",
+				"tags": [
+					"product"
+				],
 				"operationId": "get_product_full_by_id",
 				"parameters": [
 					{
@@ -375,6 +384,9 @@
 			"get": {
 				"summary": "Product by ID.",
 				"description": "Get identified project basic information. (<<ProductMin>>)",
+				"tags": [
+					"product"
+				],
 				"operationId": "get_product_min_by_id",
 				"parameters": [
 					{

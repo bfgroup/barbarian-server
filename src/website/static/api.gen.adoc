@@ -11,8 +11,8 @@ Provides information for packages available through the Barbarian service.
 == Endpoints
 
 
-[.Default]
-=== Default
+[.Product]
+=== Product
 
 
 [.getProductFullById]
@@ -189,6 +189,103 @@ ifdef::internal-generation[]
 endif::internal-generation[]
 
 
+[.productSearch]
+==== productSearch
+    
+`GET /product/search`
+
+
+
+===== Description 
+
+Search products with at least one of the words. (<<ProductMinList>))
+
+
+// markup not found, no include::{specDir}product/search/GET/spec.adoc[opts=optional]
+
+
+
+===== Parameters
+
+
+
+
+
+
+[cols="2,3,1,1,1"]
+.Query Parameters
+|===         
+|Name| Description| Required| Default| Pattern
+
+| words 
+| Set of words to search, separated by the pipe symbol. <<String>> 
+| X 
+| null 
+|  
+
+| search 
+| Options to control what kind of search to do. &lt;&lt;SearchOptions&gt;&gt;  
+| - 
+| null 
+|  
+
+|===         
+
+
+===== Return Type
+
+<<product_min_list>>
+
+
+===== Content Type
+
+* application/json
+
+===== Responses
+
+.http response codes
+[cols="2,3,1"]
+|===         
+| Code | Message | Datatype 
+
+
+| 200
+| Range of brief products. This is a sub-region of a list of &lt;&lt;ProductMin&gt;&gt; objects.
+|  <<product_min_list>>
+
+
+| 0
+| Error information. (&lt;&lt;Error&gt;&gt;)
+|  <<error>>
+
+|===         
+
+===== Samples
+
+
+// markup not found, no include::{snippetDir}product/search/GET/http-request.adoc[opts=optional]
+
+
+// markup not found, no include::{snippetDir}product/search/GET/http-response.adoc[opts=optional]
+
+
+
+// file not found, no * wiremock data link :product/search/GET/GET.json[]
+
+
+ifdef::internal-generation[]
+===== Implementation
+
+// markup not found, no include::{specDir}product/search/GET/implementation.adoc[opts=optional]
+
+
+endif::internal-generation[]
+
+
+[.Server]
+=== Server
+
+
 [.meta]
 ==== meta
     
@@ -258,99 +355,6 @@ ifdef::internal-generation[]
 ===== Implementation
 
 // markup not found, no include::{specDir}meta/GET/implementation.adoc[opts=optional]
-
-
-endif::internal-generation[]
-
-
-[.search]
-==== search
-    
-`GET /search`
-
-
-
-===== Description 
-
-Search products with at least one of the words. (<<ProductMinList>))
-
-
-// markup not found, no include::{specDir}search/GET/spec.adoc[opts=optional]
-
-
-
-===== Parameters
-
-
-
-
-
-
-[cols="2,3,1,1,1"]
-.Query Parameters
-|===         
-|Name| Description| Required| Default| Pattern
-
-| words 
-| Set of words to search, separated by the pipe symbol. <<String>> 
-| X 
-| null 
-|  
-
-| search 
-| Options to control what kind of search to do. &lt;&lt;SearchOptions&gt;&gt;  
-| - 
-| null 
-|  
-
-|===         
-
-
-===== Return Type
-
-<<product_min_list>>
-
-
-===== Content Type
-
-* application/json
-
-===== Responses
-
-.http response codes
-[cols="2,3,1"]
-|===         
-| Code | Message | Datatype 
-
-
-| 200
-| Range of brief products. This is a sub-region of a list of &lt;&lt;ProductMin&gt;&gt; objects.
-|  <<product_min_list>>
-
-
-| 0
-| Error information. (&lt;&lt;Error&gt;&gt;)
-|  <<error>>
-
-|===         
-
-===== Samples
-
-
-// markup not found, no include::{snippetDir}search/GET/http-request.adoc[opts=optional]
-
-
-// markup not found, no include::{snippetDir}search/GET/http-response.adoc[opts=optional]
-
-
-
-// file not found, no * wiremock data link :search/GET/GET.json[]
-
-
-ifdef::internal-generation[]
-===== Implementation
-
-// markup not found, no include::{specDir}search/GET/implementation.adoc[opts=optional]
 
 
 endif::internal-generation[]
