@@ -13,14 +13,6 @@ import ExpressGA from "express-universal-analytics";
 import mysql from "mysql";
 import { OpenAPIBackend, Context as OpenAPIContext, Request as OpenAPIRequest } from "openapi-backend";
 
-var db_configuration_path = null;
-if (process.env.NODE_ENV === "production") {
-	db_configuration_path = '/home/bfgbarbarian/.dbconf.mysql.barbarian.bfg.js';
-} else {
-	db_configuration_path = __dirname + '/../.dbconf.mysql.barbarian.bfg.js';
-}
-var db_configuration = require(db_configuration_path);
-
 function get_server_name() {
 	const server_name = /[/]([a-z]+[.]bfgroup[.]xyz)/g.exec(__dirname);
 	if (server_name != null) {
@@ -34,6 +26,17 @@ function get_server_name() {
 const server_name = get_server_name();
 
 console.log('Server Name:', server_name);
+
+var db_configuration: any;
+var app_package: any;
+
+if (process.env.NODE_ENV === "production") {
+	db_configuration = require('/home/bfgbarbarian/.dbconf.mysql.barbarian.bfg.js');
+	app_package = require('/home/bfgbarbarian/' + server_name + '/package.json');
+} else {
+	db_configuration = require(__dirname + '/../.dbconf.mysql.barbarian.bfg.js');
+	app_package = require(__dirname + '/../package.json');
+}
 
 /*************************************************************************
  * Conan Server V1..
@@ -56,7 +59,7 @@ epv1.get('/conans/*/upload_urls', epv1_noop);
 async function epv1_ping(req: Request, res: Response) {
 	send_json(res, {
 		"hello": "Welcome Barbarians!",
-		"version": process.env.npm_package_version
+		"version": app_package.version
 	});
 }
 epv1.get('/ping', epv1_ping);
@@ -148,7 +151,7 @@ epv1.get('/conans/:package_name/:package_version/:package_username/:package_chan
 async function epv1_hello(req: Request, res: Response) {
 	send_json(res, {
 		"hello": "Welcome Barbarians!",
-		"version": process.env.npm_package_version
+		"version": app_package.version
 	});
 }
 epv1.get('*', epv1_hello);
@@ -283,7 +286,7 @@ corum_api.register({
 async function corum_meta(context: OpenAPIContext, req: Request, res: Response) {
 	var info = {
 		"api_version": context.api.definition.info.version,
-		"server_version": process.env.npm_package_version,
+		"server_version": app_package.version,
 		"server_name": server_name,
 		"stability": "dev"
 	};
@@ -394,8 +397,8 @@ function log(req: Request, res: Response, next: any) {
 function capabilities(req: Request, res: Response, next: any) {
 	res.setHeader("X-Conan-Server-Capabilities", "revisions");
 	// res.setHeader("X-Conan-Server-Capabilities", "");
-	if (typeof (process.env.npm_package_version) == 'string')
-		res.setHeader("X-Barbarian-Server-Version", process.env.npm_package_version);
+	if (typeof (app_package.version) == 'string')
+		res.setHeader("X-Barbarian-Server-Version", app_package.version);
 	next();
 }
 
