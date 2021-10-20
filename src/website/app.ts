@@ -11,6 +11,7 @@ import { AddressInfo } from "net"
 import fetch from "node-fetch";
 import ExpressGA from "express-universal-analytics";
 import mysql from "mysql";
+import { OpenAPIBackend, Context as OpenAPIContext, Request as OpenAPIRequest } from "openapi-backend";
 
 var db_configuration_path = null;
 if (process.env.NODE_ENV === "production") {
@@ -20,7 +21,23 @@ if (process.env.NODE_ENV === "production") {
 }
 var db_configuration = require(db_configuration_path);
 
-// Conan Server V1..
+function get_server_name() {
+	const server_name = /[/]([a-z]+[.]bfgroup[.]xyz)/g.exec(__dirname);
+	if (server_name != null) {
+		return server_name[1];
+	}
+	else {
+		return "barbarian.bfgroup.xyz";
+	}
+}
+
+const server_name = get_server_name();
+
+console.log('Server Name:', server_name);
+
+/*************************************************************************
+ * Conan Server V1..
+ */
 
 var epv1 = express.Router();
 
@@ -136,7 +153,9 @@ async function epv1_hello(req: Request, res: Response) {
 }
 epv1.get('*', epv1_hello);
 
-// Conan Server V2..
+/*************************************************************************
+ * Conan Server V2..
+ */
 
 var epv2 = express.Router();
 
@@ -246,7 +265,37 @@ async function epv2_error(req: Request, res: Response) {
 }
 epv2.get('*', epv2_error);
 
-// Utility..
+/*************************************************************************
+ * Corum API..
+ */
+
+var corum_api_path = __dirname + '/static/corum.json';
+if (process.env.NODE_ENV === "production") {
+	corum_api_path = '/home/bfgbarbarian/' + server_name + '/static/corum.json';
+}
+console.log("[INFO] corum_api_path = " + corum_api_path);
+
+const corum_api = new OpenAPIBackend({ definition: corum_api_path });
+corum_api.register({
+	meta: corum_meta
+});
+
+async function corum_meta(context: OpenAPIContext, req: Request, res: Response) {
+	var info = {
+		"api_version": context.api.definition.info.version,
+		"server_version": process.env.npm_package_version,
+		"server_name": server_name,
+		"stability": "dev"
+	};
+	if (server_name == "barbarian.bfgroup.xyz") {
+		info.stability = "release";
+	}
+	return send_json(res, info);
+}
+
+/*************************************************************************
+ * Utility..
+ */
 
 function get_raw_github_recipe_data_url(req: Request) {
 	return "https://raw.githubusercontent.com/"
@@ -326,7 +375,9 @@ function db() {
 	return db_connection;
 }
 
-// Server..
+/*************************************************************************
+ * Server..
+ */
 
 function log(req: Request, res: Response, next: any) {
 	console.log("[INFO] url = " + get_barbarian_request_url(req) + " params = " + JSON.stringify(req.params) + " query = " + JSON.stringify(req.query));
@@ -371,21 +422,13 @@ function track_download(req: Request) {
 		});
 }
 
-const server_name = /[/]([a-z]+[.]bfgroup[.]xyz)/g.exec(__dirname);
-if (server_name != null) {
-	console.log('Server Name:', server_name[1]);
-}
-
 function get_barbarian_base_url(req: Request) {
 	const { address, family, port } = server.address() as AddressInfo;
 	if (address != undefined) {
 		return req.protocol + "://" + address + ':' + port;
 	}
-	else if (server_name != null) {
-		return "https://" + server_name[1];
-	}
 	else {
-		return "https://barbarian.bfgroup.xyz";
+		return "https://" + server_name;
 	}
 }
 
@@ -400,6 +443,7 @@ app.use(log);
 app.use(capabilities);
 app.use("/github/v1", epv1);
 app.use("/github/v2", epv2);
+app.use("/corum", (req: Request, res: Response) => corum_api.handleRequest(req as OpenAPIRequest, req, res));
 
 // async function ep_welcome(req: Request, res: Response) {
 // 	res.send('Welcome Barbarians!');

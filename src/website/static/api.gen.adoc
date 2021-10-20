@@ -367,7 +367,7 @@ endif::internal-generation[]
 [#Description]
 === _Description_ 
 
-Full, aka long, description.
+Full, aka long, formatted description text.
 
 [.fields-Description]
 [cols="2,1,2,4,1"]
@@ -428,6 +428,18 @@ Information about the server and API.
 | X 
 | String  
 | The version of the API.
+|  
+
+| server_version 
+|  
+| String  
+| The version of the server.
+|  
+
+| server_name 
+|  
+| String  
+| The name of the server, from the point of view of the server.
 |  
 
 | stability 
