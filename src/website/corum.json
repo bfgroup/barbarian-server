@@ -79,12 +79,12 @@
       "error": {
         "type": "object",
         "required": [
-          "code",
+          "status",
           "message"
         ],
         "properties": {
-          "code": {
-            "description": "Numeric error code.",
+          "status": {
+            "description": "Numeric error status code.",
             "type": "integer",
             "format": "int32"
           },

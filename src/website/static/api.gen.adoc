@@ -399,10 +399,10 @@ Full, aka long, formatted description text.
 |===         
 | Field Name| Required| Type| Description| Format
 
-| code 
+| status 
 | X 
 | Integer  
-| Numeric error code.
+| Numeric error status code.
 | int32 
 
 | message 

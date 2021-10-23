@@ -10,8 +10,20 @@ import { Request, Response } from "express";
 import { AddressInfo } from "net"
 import fetch from "node-fetch";
 import ExpressGA from "express-universal-analytics";
-import mysql from "mysql";
+import mysql from "mysql2/promise";
+import { Pool as dbPool, PoolConnection as dbConnection } from "mysql2/promise";
+import { RowDataPacket as dbRow, ResultSetHeader as dbResult } from "mysql2";
 import { OpenAPIBackend, Context as OpenAPIContext, Request as OpenAPIRequest } from "openapi-backend";
+
+/*************************************************************************
+ * Server name.. We need the server name in both composing self URLs and
+ * in reading "configuration" files. The server name turns out to be
+ * rather tricky to compute as there are various contexts: localhost
+ * with variant=release build, localhost with variant-debug build,
+ * deployed production, and deployed development. In most cases we attempt
+ * to use the directory name as we control that both locally and deployed.
+ * But fall back to the sensible production name.
+ */
 
 function get_server_name() {
 	const server_name = /[/]([a-z]+[.]bfgroup[.]xyz)/g.exec(__dirname);
@@ -27,10 +39,29 @@ const server_name = get_server_name();
 
 console.log('Server Name:', server_name);
 
+/*************************************************************************
+ * Identify the two main modes of operation fro the server. Production is
+ * what's released to "barbarian.bfgroup.xyz". And development will be
+ * anything else, like local dev or the jenna test server.
+ */
+
+function is_production() {
+	return process.env.NODE_ENV === "production" || server_name === "barbarian.bfgroup.xyz";
+}
+
+function is_dev() {
+	return !is_production();
+}
+
+/*************************************************************************
+ * Configuration data we fetch externally. It means we have to compute
+ * where that data is. As the location depends on which environment we are
+ * running as.
+ */
 var db_configuration: any;
 var app_package: any;
 
-if (process.env.NODE_ENV === "production") {
+if (is_production()) {
 	db_configuration = require('/home/bfgbarbarian/.dbconf.mysql.barbarian.bfg.js');
 	app_package = require('/home/bfgbarbarian/' + server_name + '/package.json');
 } else {
@@ -90,8 +121,7 @@ async function epv1_snapshot(req: Request, res: Response) {
 			return send_json(res, snapshot);
 		}
 		else {
-			send_404(res);
-			return;
+			return send_404(res);
 		}
 	}
 }
@@ -108,7 +138,7 @@ epv1.get('/conans/:package_name/:package_version/:package_username/:package_chan
 async function epv1_digest(req: Request, res: Response) {
 	var recipe_data_url = await fetch_github_recipe_data_url_latest(req, res);
 	if (recipe_data_url != null)
-		send_json(res, {
+		return send_json(res, {
 			"conanmanifest.txt": recipe_data_url + "/files/conanmanifest.txt"
 		});
 }
@@ -129,13 +159,11 @@ epv1.get('/conans/:package_name/:package_version/:package_username/:package_chan
 async function epv1_download_urls(req: Request, res: Response) {
 	var latest_revision = await fetch_github_recipe_latest_revision(req, res);
 	if (latest_revision == null) {
-		send_404(res);
-		return null;
+		return send_404(res);
 	}
 	var files = await fetch_json(get_raw_github_recipe_data_url(req) + "/" + latest_revision + "/files.json");
 	if (files == null) {
-		send_404(res);
-		return null;
+		return send_404(res);
 	}
 	var downloads: { [file: string]: string } = {};
 	for (var file in files.files) {
@@ -149,7 +177,7 @@ epv1.get('/conans/:package_name/:package_version/:package_username/:package_chan
 	Fallback.
 */
 async function epv1_hello(req: Request, res: Response) {
-	send_json(res, {
+	return send_json(res, {
 		"hello": "Welcome Barbarians!",
 		"version": app_package.version
 	});
@@ -171,33 +199,38 @@ var epv2 = express.Router();
 	}
 */
 async function epv2_search(req: Request, res: Response) {
-	var query = req.query.q?.toString();
-	query = query?.replace(/_/g, '\\_');
-	query = query?.replace(/%/g, '\\%');
-	query = query?.replace(/[*]/g, '%');
-	var binary = "";
-	if (('ignorecase' in req.query) && req.query.ignorecase == "False") {
-		binary = "BINARY";
-	}
-	var sql = mysql.format(
-		"SELECT"
-		+ " CONCAT(name, '/', version, '@', identity) as ref"
-		+ " FROM barbarian_package"
-		+ " WHERE packager = 'conan'"
-		+ " AND CONCAT(name,'/',version) LIKE " + binary + " ?"
-		+ " ORDER BY name"
-		+ " LIMIT 100",
-		[query]);
-	db().query(sql,
-		function (error: any, results: Array<any>, fields: any) {
-			var refs: string[] = [];
-			if (error) {
-				console.error("[ERROR] search failed: " + error);
-			} else {
-				refs = results.map(row => row.ref);
+	try {
+		var connection = undefined;
+		try {
+			connection = await db();
+			var query = req.query.q?.toString();
+			query = query?.replace(/_/g, '\\_');
+			query = query?.replace(/%/g, '\\%');
+			query = query?.replace(/[*]/g, '%');
+			var binary = "";
+			if (('ignorecase' in req.query) && req.query.ignorecase == "False") {
+				binary = "BINARY";
 			}
-			send_json(res, { "results": refs });
-		});
+			var sql = mysql.format(
+				"SELECT"
+				+ " CONCAT(name, '/', version, '@', identity) as ref"
+				+ " FROM barbarian_package"
+				+ " WHERE packager = 'conan'"
+				+ " AND CONCAT(name,'/',version) LIKE " + binary + " ?"
+				+ " ORDER BY name"
+				+ " LIMIT 100",
+				[query]);
+			const [results,] = await connection.query<dbRow[]>(sql);
+			var refs: string[] = [];
+			for (const row of results)
+				refs = results.map(row => row.ref);
+			return send_json(res, { "results": refs });
+		} finally {
+			db_release(connection);
+		}
+	} catch (e) {
+		return send_error(res, 500, "[ERROR] search failed: " + e);
+	}
 }
 epv2.get('/conans/search', epv2_search);
 
@@ -217,8 +250,7 @@ async function epv2_latest(req: Request, res: Response) {
 		return send_json(res, latest);
 	}
 	else {
-		send_404(res);
-		return null;
+		return send_404(res);
 	}
 }
 epv2.get('/conans/:package_name/:package_version/:package_username/:package_channel/latest', epv2_latest);
@@ -242,8 +274,7 @@ async function epv2_files(req: Request, res: Response) {
 		return send_json(res, files);
 	}
 	else {
-		send_404(res);
-		return null;
+		return send_404(res);
 	}
 }
 epv2.get('/conans/:package_name/:package_version/:package_username/:package_channel/revisions/:revision/files', epv2_files);
@@ -253,7 +284,7 @@ epv2.get('/conans/:package_name/:package_version/:package_username/:package_chan
 */
 async function epv2_files_download(req: Request, res: Response) {
 	if (req.params.file === "conan_export.tgz") {
-		track_download(req);
+		await track_download(req, res);
 	}
 	var recipe_data_url = get_raw_github_recipe_data_url(req);
 	res.redirect(recipe_data_url + "/" + req.params.revision + "/files/" + req.params.file);
@@ -264,7 +295,7 @@ epv2.get('/conans/:package_name/:package_version/:package_username/:package_chan
 	Everything else.. 404.
 */
 async function epv2_error(req: Request, res: Response) {
-	send_404(res);
+	return send_404(res);
 }
 epv2.get('*', epv2_error);
 
@@ -280,8 +311,37 @@ console.log("[INFO] corum_api_path = " + corum_api_path);
 
 const corum_api = new OpenAPIBackend({ definition: corum_api_path });
 corum_api.register({
-	meta: corum_meta
+	notFound: corum_not_found,
+	postResponseHandler: corum_validate_response,
+	meta: corum_meta,
+	get_product_min_by_id: corum_product_min_by_id,
+	get_product_full_by_id: corum_product_full_by_id,
+	product_search: corum_product_search
 });
+
+function corum_handle_request(req: Request, res: Response) {
+	return corum_api.handleRequest(req as OpenAPIRequest, req, res);
+}
+
+async function corum_validate_response(context: OpenAPIContext, req: Request, res: Response) {
+	if (is_dev() && context.operation) {
+		const valid = context.api.validateResponse(
+			(typeof context.response) === "object"
+				? context.response
+				: JSON.parse(context.response),
+			context.operation)
+		if (valid.errors) {
+			console.log(
+				"[ERROR] Response validation failed for operation '" + context.operation.operationId + "':\n" + JSON.stringify(valid.errors, null, 2)
+				+ "\nResponse:\n" + context.response
+			);
+		}
+	}
+}
+
+async function corum_not_found(context: OpenAPIContext, req: Request, res: Response) {
+	return send_404(res);
+}
 
 async function corum_meta(context: OpenAPIContext, req: Request, res: Response) {
 	var info = {
@@ -296,18 +356,97 @@ async function corum_meta(context: OpenAPIContext, req: Request, res: Response) 
 	return send_json(res, info);
 }
 
+async function corum_product_min_by_id(context: OpenAPIContext, req: Request, res: Response) {
+	try {
+		var connection = undefined;
+		try {
+			connection = await db();
+			const [results,] = await connection.query<dbRow[]>(
+				"SELECT"
+				+ " id, name, description_brief, topic, license"
+				+ " FROM barbarian_project"
+				+ " WHERE id = ?"
+				+ " LIMIT 1",
+				[context.request.params.product_id]
+			);
+			if (results.length < 1) {
+				return send_404(res);
+			} else {
+				var info = {
+					"id": results[0].id,
+					"name": results[0].name,
+					"description_brief": (results[0].description_brief ?? ""),
+					"topic": (results[0].topic ?? "").split(" "),
+					"license": (results[0].license ?? "")
+				}
+				return send_json(res, info);
+			}
+		} finally {
+			db_release(connection);
+		}
+	} catch (e) {
+		return send_error(res, 500, "[ERROR] " + e);
+	}
+}
+
+async function corum_product_full_by_id(context: OpenAPIContext, req: Request, res: Response) {
+	try {
+		var connection = undefined;
+		try {
+			connection = await db();
+			const [results,] = await connection.query<dbRow[]>(
+				"",
+				[]
+			);
+			if (results.length < 1) {
+				return send_404(res);
+			} else {
+				var info = {};
+				return send_json(res, info);
+			}
+		} finally {
+			db_release(connection);
+		}
+	} catch (e) {
+		return send_error(res, 500, "[ERROR] " + e);
+	}
+}
+
+async function corum_product_search(context: OpenAPIContext, req: Request, res: Response) {
+	try {
+		var connection = undefined;
+		try {
+			connection = await db();
+			const [results,] = await connection.query<dbRow[]>(
+				"",
+				[]
+			);
+			if (results.length < 1) {
+				return send_404(res);
+			} else {
+				var info = {};
+				return send_json(res, info);
+			}
+		} finally {
+			db_release(connection);
+		}
+	} catch (e) {
+		return send_error(res, 500, "[ERROR] " + e);
+	}
+}
+
 /*************************************************************************
  * Utility..
  */
 
-function get_raw_github_recipe_data_url(req: Request) {
+function get_raw_github_recipe_data_url(req: Request): string {
 	return "https://raw.githubusercontent.com/"
 		+ req.params.package_username + "/" + req.params.package_channel
 		+ "/barbarian/"
 		+ req.params.package_name + "/" + req.params.package_version;
 }
 
-function get_self_github_recipe_files_url(req: Request, rev: string) {
+function get_self_github_recipe_files_url(req: Request, rev: string): string {
 	return get_barbarian_base_url(req)
 		+ "/github/v2/conans"
 		+ "/" + req.params.package_name + "/" + req.params.package_version
@@ -315,22 +454,28 @@ function get_self_github_recipe_files_url(req: Request, rev: string) {
 		+ "/revisions/" + rev + "/files";
 }
 
-function send_json(res: Response, data: object) {
+function send_json(res: Response, data: object, status?: number): string {
 	res.setHeader("Content-Type", "application/json");
-	res.status(200).send(Buffer.from(JSON.stringify(data)));
+	var json_string = JSON.stringify(data);
+	res.status(status ? status : 200).send(Buffer.from(json_string));
+	return json_string;
 }
 
-function send_404(res: Response) {
-	res.setHeader("Content-Type", "application/json");
-	res.status(404).send(Buffer.from(JSON.stringify({
-		'errors': [{
-			'status': 404,
-			'message': 'Not Found'
-		}]
-	})));
+function send_error(res: Response, status: number, message: string): string {
+	return send_json(
+		res,
+		{
+			'status': status,
+			'message': message
+		},
+		status);
 }
 
-async function fetch_json(url: string) {
+function send_404(res: Response): string {
+	return send_error(res, 404, "Not Found");
+}
+
+async function fetch_json(url: string): Promise<any> {
 	try {
 		console.log("[INFO] fetch_json: " + url);
 		const response = await fetch(url);
@@ -343,11 +488,11 @@ async function fetch_json(url: string) {
 	};
 }
 
-async function fetch_self_json(req: Request, path: string) {
+async function fetch_self_json(req: Request, path: string): Promise<any> {
 	return fetch_json(get_barbarian_base_url(req) + path);
 }
 
-async function fetch_github_recipe_latest_revision(req: Request, res: Response) {
+async function fetch_github_recipe_latest_revision(req: Request, res: Response): Promise<any> {
 	var recipe_data_url = get_raw_github_recipe_data_url(req);
 	var latest = await fetch_json(recipe_data_url + "/latest.json");
 	if (latest != null) {
@@ -358,24 +503,39 @@ async function fetch_github_recipe_latest_revision(req: Request, res: Response) 
 	}
 }
 
-async function fetch_github_recipe_data_url_latest(req: Request, res: Response) {
+async function fetch_github_recipe_data_url_latest(req: Request, res: Response): Promise<any> {
 	var latest_revision = await fetch_github_recipe_latest_revision(req, res);
 	if (latest_revision != null) {
 		return get_raw_github_recipe_data_url(req) + "/" + latest_revision;
 	}
 	else {
-		send_404(res);
-		return null;
+		return send_404(res);
 	}
 }
 
-var db_connection: mysql.Connection;
+/*************************************************************************
+ * MySQL database connections. Each call to `db()` will return a new
+ * connection. When done with the connection `db_release()` will make it
+ * available for the next caller.`
+ */
 
-function db() {
-	if (db_connection == null) {
-		db_connection = mysql.createConnection(db_configuration);
+var db_pool: dbPool;
+
+async function db(): Promise<dbConnection> {
+	try {
+		if (db_pool == null) {
+			db_configuration.namedPlaceholders = true;
+			db_pool = mysql.createPool(db_configuration);
+		}
+		return await db_pool.getConnection();
+	} finally {
 	}
-	return db_connection;
+}
+
+function db_release(connection?: dbConnection) {
+	if (connection) {
+		connection.release();
+	}
 }
 
 /*************************************************************************
@@ -402,27 +562,38 @@ function capabilities(req: Request, res: Response, next: any) {
 	next();
 }
 
-function track_download(req: Request) {
-	db().query(
-		'INSERT INTO barbarian_track SET ?',
-		{
-			package_name: req.params.package_name,
-			package_version: req.params.package_version,
-			package_username: req.params.package_username,
-			package_channel: req.params.package_channel,
-			revision: req.params.revision,
-			dp: req.originalUrl,
-			ua: <string>req.headers['user-agent'],
-			uip: req.connection.remoteAddress
-				|| req.socket.remoteAddress
-				|| (<string>req.headers['x-forwarded-for']).split(',').pop()
-		},
-		function (error: any, results: any, fields: any) {
-			if (error) {
-				console.error("[ERROR] track_download failed: " + error);
-				db().end();
-			}
-		});
+async function track_download(req: Request, res: Response) {
+	try {
+		var connection = undefined;
+		try {
+			connection = await db();
+			await connection.execute(
+				'INSERT INTO barbarian_track SET'
+				+ ' package_name = :package_name,'
+				+ ' package_version = :package_version,'
+				+ ' package_username = :package_username,'
+				+ ' package_channel = :package_channel,'
+				+ ' revision = :revision,'
+				+ ' dp = :dp, ua = :ua, uip = :uip',
+				{
+					package_name: req.params.package_name,
+					package_version: req.params.package_version,
+					package_username: req.params.package_username,
+					package_channel: req.params.package_channel,
+					revision: req.params.revision,
+					dp: req.originalUrl,
+					ua: <string>req.headers['user-agent'],
+					uip: req.connection.remoteAddress
+						|| req.socket.remoteAddress
+						|| (<string>req.headers['x-forwarded-for']).split(',').pop()
+				});
+		} finally {
+			db_release(connection);
+		}
+	} catch (e) {
+		console.error("[ERROR] track_download failed: " + e);
+		return send_error(res, 500, "[ERROR] track_download failed: " + e);
+	}
 }
 
 function get_barbarian_base_url(req: Request) {
@@ -446,7 +617,7 @@ app.use(log);
 app.use(capabilities);
 app.use("/github/v1", epv1);
 app.use("/github/v2", epv2);
-app.use("/corum", (req: Request, res: Response) => corum_api.handleRequest(req as OpenAPIRequest, req, res));
+app.use("/corum", corum_handle_request);
 
 // async function ep_welcome(req: Request, res: Response) {
 // 	res.send('Welcome Barbarians!');

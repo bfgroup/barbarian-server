@@ -32,14 +32,13 @@
 	"dependencies": {
 		"express": "^4.17.1",
 		"express-universal-analytics": "^0.7.1",
-		"mysql": "^2.18.1",
+		"mysql2": "^2.3.2",
 		"node-fetch": "^2.6.1",
 		"openapi-backend": "^4.2.0"
 	},
 	"devDependencies": {
 		"@openapitools/openapi-generator-cli": "^2.4.12",
 		"@types/express": "^4.17.11",
-		"@types/mysql": "^2.15.18",
 		"@types/node-fetch": "^2.5.10"
 	}
 }
