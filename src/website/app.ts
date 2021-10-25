@@ -378,7 +378,7 @@ async function corum_product_min_by_id(context: OpenAPIContext, req: Request, re
 					"description_brief": (results[0].description_brief ?? ""),
 					"topic": (results[0].topic ?? "").split(" "),
 					"license": (results[0].license ?? "")
-				}
+				};
 				return send_json(res, info);
 			}
 		} finally {
@@ -395,14 +395,31 @@ async function corum_product_full_by_id(context: OpenAPIContext, req: Request, r
 		try {
 			connection = await db();
 			const [results,] = await connection.query<dbRow[]>(
-				"",
-				[]
+				"SELECT"
+				+ " id, name, description_brief, topic, license, updated, info"
+				+ " FROM barbarian_project"
+				+ " WHERE id = ?"
+				+ " LIMIT 1",
+				[context.request.params.product_id]
 			);
 			if (results.length < 1) {
 				return send_404(res);
 			} else {
-				var info = {};
-				return send_json(res, info);
+				var result = {
+					"id": results[0].id,
+					"name": results[0].name,
+					"description_brief": (results[0].description_brief ?? ""),
+					"topic": (results[0].topic ?? "").split(" "),
+					"license": (results[0].license ?? ""),
+					"updated": results[0].updated,
+					"homepage": results[0].info?.homepage,
+					"author": results[0].info?.author,
+					"dëscription_long": {
+						"text": results[0].info?.barbarian?.description?.text,
+						"format": results[0].info?.barbarian?.description?.format
+					}
+				};
+				return send_json(res, result);
 			}
 		} finally {
 			db_release(connection);
