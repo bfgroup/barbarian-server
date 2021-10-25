@@ -414,7 +414,7 @@ async function corum_product_full_by_id(context: OpenAPIContext, req: Request, r
 					"updated": results[0].updated,
 					"homepage": results[0].info?.homepage,
 					"author": results[0].info?.author,
-					"dëscription_long": {
+					"description_long": {
 						"text": results[0].info?.barbarian?.description?.text,
 						"format": results[0].info?.barbarian?.description?.format
 					}
