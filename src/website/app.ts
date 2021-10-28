@@ -313,6 +313,7 @@ const corum_api = new OpenAPIBackend({ definition: corum_api_path });
 corum_api.register({
 	notFound: corum_not_found,
 	postResponseHandler: corum_validate_response,
+	validationFail: corum_validation_fail,
 	meta: corum_meta,
 	get_product_min_by_id: corum_product_min_by_id,
 	get_product_full_by_id: corum_product_full_by_id,
@@ -337,6 +338,11 @@ async function corum_validate_response(context: OpenAPIContext, req: Request, re
 			);
 		}
 	}
+}
+
+async function corum_validation_fail(context: OpenAPIContext, req: Request, res: Response) {
+	var errors = context.validation.errors?.map(error => error.message);
+	return send_error(res, 400, "Failed validation: " + errors?.join(", ") + ".");
 }
 
 async function corum_not_found(context: OpenAPIContext, req: Request, res: Response) {
