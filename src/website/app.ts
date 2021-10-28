@@ -356,6 +356,16 @@ async function corum_meta(context: OpenAPIContext, req: Request, res: Response) 
 	return send_json(res, info);
 }
 
+function corum_result_to_product_min(result: any) {
+	return {
+		"id": result.id,
+		"name": result.name,
+		"description_brief": (result.description_brief ?? ""),
+		"topic": (result.topic ?? "").split(" "),
+		"license": (result.license ?? "")
+	};
+}
+
 async function corum_product_min_by_id(context: OpenAPIContext, req: Request, res: Response) {
 	try {
 		var connection = undefined;
@@ -372,14 +382,7 @@ async function corum_product_min_by_id(context: OpenAPIContext, req: Request, re
 			if (results.length < 1) {
 				return send_404(res);
 			} else {
-				var info = {
-					"id": results[0].id,
-					"name": results[0].name,
-					"description_brief": (results[0].description_brief ?? ""),
-					"topic": (results[0].topic ?? "").split(" "),
-					"license": (results[0].license ?? "")
-				};
-				return send_json(res, info);
+				return send_json(res, corum_result_to_product_min(results[0]));
 			}
 		} finally {
 			db_release(connection);
@@ -429,21 +432,56 @@ async function corum_product_full_by_id(context: OpenAPIContext, req: Request, r
 	}
 }
 
+function corum_product_search_build_query(req: Request, for_count: boolean): string {
+	var match_fields = [];
+	switch (req.query?.in ?? "all") {
+		case "topic": match_fields = ["topic"]; break;
+		case "name": match_fields = ["name"]; break;
+		default: match_fields = ["name", "description_brief", "topic"]; break;
+	}
+	var query = "SELECT"
+		+ (for_count
+			? " COUNT(*) as total"
+			: " id, name, description_brief, topic, license")
+		+ " FROM barbarian_project"
+		+ " WHERE"
+		+ " MATCH(" + match_fields.join(",") + ")"
+		+ " AGAINST (? IN NATURAL LANGUAGE MODE)"
+		+ (for_count
+			? ""
+			: " LIMIT ?,100")
+		;
+	return query;
+}
+
 async function corum_product_search(context: OpenAPIContext, req: Request, res: Response) {
 	try {
 		var connection = undefined;
 		try {
 			connection = await db();
-			const [results,] = await connection.query<dbRow[]>(
-				"",
-				[]
-			);
+			var match = ((req.query.words ?? "") as string).replace('|', ' ');
+			var offset = Number.parseInt((req.query.start ?? "0") as string);
+			console.log("[INFO] words: " + match);
+			var query_data = corum_product_search_build_query(req, false);
+			var query_count = corum_product_search_build_query(req, true);
+			const [results,] = await connection.query<dbRow[]>(query_data, [match, offset]);
 			if (results.length < 1) {
 				return send_404(res);
-			} else {
-				var info = {};
-				return send_json(res, info);
 			}
+			const [count,] = await connection.query<dbRow[]>(query_count, [match]);
+			if (count.length < 1) {
+				return send_404(res);
+			}
+			var products = results.map(result => {
+				return corum_result_to_product_min(result);
+			});
+			var info = {
+				"start": offset,
+				"count": products.length,
+				"total": count[0].total,
+				"products": products
+			};
+			return send_json(res, info);
 		} finally {
 			db_release(connection);
 		}

@@ -198,7 +198,7 @@ endif::internal-generation[]
 
 ===== Description 
 
-Search products with at least one of the words. (<<ProductMinList>))
+Search products with at least one of the words. (<<ProductMinList>)
 
 
 // markup not found, no include::{specDir}product/search/GET/spec.adoc[opts=optional]
@@ -224,7 +224,7 @@ Search products with at least one of the words. (<<ProductMinList>))
 |  
 
 | search 
-| Options to control what kind of search to do. &lt;&lt;SearchOptions&gt;&gt;  
+| Options to control what kind of search to do. (&lt;&lt;SearchOptions&gt;&gt;)  
 | - 
 | null 
 |  
@@ -571,53 +571,48 @@ Range, i.e. window, of brief products.
 |===         
 | Field Name| Required| Type| Description| Format
 
-| id 
+| products 
 | X 
-| Long  
-| Numeric unique identifier for project.
-| int64 
-
-| name 
-| X 
-| String  
-| Unique symbolic name for project.
-|  
-
-| description_brief 
-|  
-| String  
-| Brief text description of the project.
-|  
-
-| topic 
-|  
-| List  of <<string>> 
-| Individual topical tags for the project.
-|  
-
-| license 
-|  
-| String  
-| License that applies to the project.
+| List  of <<product_min>> 
+| List of brief products in the range. (&lt;&lt;ProductMin&gt;&gt;)
 |  
 
 | start 
 | X 
 | Long  
-| 
+| The start of the list range, zero based.
 | int64 
 
 | count 
 | X 
 | Long  
-| 
+| Number of items in the list range.
 | int64 
 
 | total 
 | X 
 | Long  
-| 
+| Number of items in the whole list.
 | int64 
+
+|===
+
+
+[#ProductMinListAllOf]
+=== _ProductMinListAllOf_ 
+
+
+
+[.fields-ProductMinListAllOf]
+[cols="2,1,2,4,1"]
+|===         
+| Field Name| Required| Type| Description| Format
+
+| products 
+| X 
+| List  of <<product_min>> 
+| List of brief products in the range. (&lt;&lt;ProductMin&gt;&gt;)
+|  
 
 |===
 
@@ -635,19 +630,19 @@ Range, i.e. window, of brief products.
 | start 
 | X 
 | Long  
-| 
+| The start of the list range, zero based.
 | int64 
 
 | count 
 | X 
 | Long  
-| 
+| Number of items in the list range.
 | int64 
 
 | total 
 | X 
 | Long  
-| 
+| Number of items in the whole list.
 | int64 
 
 |===
@@ -663,17 +658,17 @@ Options to control what kind of search to do.
 |===         
 | Field Name| Required| Type| Description| Format
 
-| in_tags 
+| in 
 |  
-| Boolean  
-| Search in the tags, if applicable. Defaults to &#39;false&#39;.
-|  
+| String  
+| The field(s) to search for a match of words.
+|  _Enum:_ topic, name, all, 
 
-| in_description 
+| start 
 |  
-| Boolean  
-| Search in descriptions, if applicable. Defaults to &#39;true&#39;
-|  
+| Long  
+| The start of the list range, zero based.
+| int64 
 
 |===
 
