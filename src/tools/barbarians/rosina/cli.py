@@ -172,6 +172,9 @@ DB_PASSWORD, DB_DATABASE.
         if latest_package:
             # Obtain the details package info from PDM.
             package_info = self.obtain_conan_package_info(latest_package)
+            if not package_info:
+                # Failed to find the package, or info. Ignore the update.
+                return
             # Set project info from package.
             project.description_brief = package_info['description']
             project.topic = package_info['topics']
@@ -198,8 +201,12 @@ DB_PASSWORD, DB_DATABASE.
             package_remote,
             "https://barbarian.bfgroup.xyz/github",
             force=True)
-        package_info = conan_api.inspect(
-            package_ref, package_attributes, package_remote)
+        try:
+            package_info = conan_api.inspect(
+                package_ref, package_attributes, package_remote)
+        except conans.errors.PackageNotFoundException:
+            print("[ERROR] Failed to inspect package", package_ref, "ignoring.")
+            return None
         # Extract description if it's from an export file.
         if 'barbarian' in package_info and 'description' in package_info['barbarian'] and 'file' in package_info['barbarian']['description']:
             description_file = package_info['barbarian']['description']['file']

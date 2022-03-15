@@ -7,7 +7,7 @@ from setuptools import setup, find_packages, find_namespace_packages
 setup(
     # metadata
     name='barbarian-server',
-    version='0.1',
+    version='0.1.1',
     description='Tools to manage Barbarian style server support.',
     url='https://barbarian.bfgroup.xyz',
     author='René Ferdinand Rivera Morell',
