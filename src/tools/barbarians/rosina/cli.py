@@ -204,7 +204,7 @@ DB_PASSWORD, DB_DATABASE.
         try:
             package_info = conan_api.inspect(
                 package_ref, package_attributes, package_remote)
-        except conans.errors.PackageNotFoundException:
+        except conans.errors.NotFoundException:
             print("[ERROR] Failed to inspect package", package_ref, "ignoring.")
             return None
         # Extract description if it's from an export file.
