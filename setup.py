@@ -7,7 +7,7 @@ from setuptools import setup, find_packages, find_namespace_packages
 setup(
     # metadata
     name='barbarian-server',
-    version='0.1.1',
+    version='0.2.0',
     description='Tools to manage Barbarian style server support.',
     url='https://barbarian.bfgroup.xyz',
     author='René Ferdinand Rivera Morell',
@@ -25,12 +25,12 @@ setup(
     license='BSL 1.0',
     # options
     install_requires=[
-        'conan >= 1.39',
+        'conan >= 1.51.0',
         # 'barbarian >= 0.1',
         'mysql-connector-python >= 8.0.0',
-        'peewee >= 3.14.4',
-        'node-semver >= 0.6.1',
-        'ua-parser >= 0.10.0'
+        'peewee >= 3.15.2',
+        'node-semver == 0.6.1',
+        'ua-parser >= 0.16.1'
     ],
     package_data={'barbarians': []},
     package_dir={"": "src/tools"},

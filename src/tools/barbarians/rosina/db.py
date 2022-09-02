@@ -1,4 +1,4 @@
-# Copyright 2021 René Ferdinand Rivera Morell
+# Copyright 2021-2022 René Ferdinand Rivera Morell
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE.txt or http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,54 +7,37 @@ import os
 import peewee
 import playhouse.mysql_ext
 import json
+import uuid
+
+from playhouse.mysql_ext import JSONField
+
+Models = []
 
 
-class Database(playhouse.mysql_ext.MySQLConnectorDatabase):
+class Database(peewee.DatabaseProxy):
     """
     Manages Barbarian database connection initialized from env settings.
     It optionally binds models to the database for immediate use.
     """
+    __slots__ = ('obj', '_callbacks', '_models', '_bind')
 
-    def __init__(self, models=None):
-        super().__init__(
+    def __init__(self, models=None, dbkind=None):
+        super().__init__()
+        if not dbkind and os.getenv("DB_KIND") == "mariadb":
+            dbkind = playhouse.mysql_ext.MariaDBConnectorDatabase
+        if not dbkind and os.getenv("DB_KIND") == "mysql":
+            dbkind = playhouse.mysql_ext.MySQLConnectorDatabase
+        database = dbkind(
             os.getenv("DB_DATABASE"),
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD"),
             host=os.getenv("DB_HOST")
         )
-        self._models = models
-        self._bind = None
-
-    def __enter__(self):
-        super().__enter__()
-        if self._models is not None:
-            self._bind = self.bind_ctx(self._models)
-            self._bind.__enter__()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self._bind is not None:
-            self._bind.__exit__(exc_type, exc_val, exc_tb)
-        super().__exit__(exc_type, exc_val, exc_tb)
+        self.initialize(database)
+        self.bind(Models)
 
 
-class JSONField(peewee.TextField):
-    """
-    Db field backed by Mysql JSON field type that converts to/from Python
-    datastructure.
-    """
-    field_type = 'JSON'
-
-    def db_value(self, value):
-        if value is not None:
-            return json.dumps(value, sort_keys=True)
-
-    def python_value(self, value):
-        if value is not None:
-            return json.loads(value)
-
-
-class TagsField(peewee.TextField):
+class TagsField(peewee.UUIDField):
     """
     Db field backed by Mysql TEXT field type that converts to/from Python
     list and a space separated set of tag values.
@@ -80,6 +63,20 @@ class Model(peewee.Model):
     """
     class Meta:
         table_function = barbarian_table_name
+
+
+class Meta(Model):
+    """
+    Metadata about the database and its schema. It's a freeform key=value
+    store where the value is a JSON object.
+    """
+    key = peewee.CharField(max_length=100, primary_key=True)  # varchar(100)
+    value = JSONField(null=True)  # JSON
+
+    version = {"schema": "2"}
+
+
+Models.append(Meta)
 
 
 class Track(Model):
@@ -109,6 +106,9 @@ class Track(Model):
         return result
 
 
+Models.append(Track)
+
+
 class Project(Model):
     """
     A project is the top level container for ay kind of packageable product.
@@ -116,7 +116,7 @@ class Project(Model):
     has packages for it available as sub entires in the index. It contains
     key information that is shared among all the packages for the project.
     """
-    id = peewee.BigIntegerField(primary_key=True)  # bigint(20)
+    uuid = peewee.UUIDField(primary_key=True)  # varchar(40)
     # Ideal, overall, name for the project.
     name = peewee.CharField(max_length=100)  # varchar(100)
     # Brief text description of the project.
@@ -131,13 +131,16 @@ class Project(Model):
     info = JSONField(null=True)  # JSON
 
 
+Models.append(Project)
+
+
 class Package(Model):
     """
     A package is an instance of a project available in a particular
     PDM (aka packager).
     """
     project = peewee.ForeignKeyField(
-        Project, backref="packages", column_name='project')  # bigint(20)
+        Project, backref="packages", column_name='project')  # varchar(40)
     # Package name for the PDM.
     name = peewee.CharField(max_length=100)  # varchar(100)
     # Version in form needed for the package.
@@ -156,13 +159,16 @@ class Package(Model):
             'project', 'name', 'version', 'identity', 'packager')
 
 
+Models.append((Package))
+
+
 class Stat(Model):
     """
     Single entry for a package statistic value.
     """
     id = peewee.BigIntegerField(primary_key=True)  # bigint(20)
     project = peewee.ForeignKeyField(
-        Project, backref="packages", column_name='project')  # bigint(20)
+        Project, backref="packages", column_name='project')  # varchar(40)
     # Package name for the PDM.
     package_name = peewee.CharField(max_length=100)  # varchar(100)
     # Version in form needed for the package.
@@ -183,3 +189,6 @@ class Stat(Model):
     ])  # char(4)
     # The stat value, if it's a decimal.
     value_i = peewee.BigIntegerField()  # bigint(20)
+
+
+Models.append(Stat)

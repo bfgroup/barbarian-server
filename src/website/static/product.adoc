@@ -1,0 +1,17 @@
+= xref:index.adoc[Barbarian]
+:copyright: Copyright 2022 René Ferdinand Rivera Morell
+:version-label!:
+:reproducible:
+:nofooter:
+:sectlinks:
+:linkcss:
+:stylesheet: barbarian.css
+:icons: font
+:caution-caption: ⚑
+:important-caption: ‼
+:note-caption: ℹ
+:tip-caption: ☀
+:warning-caption: ⚠
+:source-highlighter: rouge
+
+include::footer.part.adoc[]

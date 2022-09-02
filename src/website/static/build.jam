@@ -40,6 +40,10 @@ html license.html : license.adoc ;
 html reference.html : reference.adoc ;
 html api.html : api.adoc : <dependency>api-gen ;
 
+html product.html : product.adoc ;
+html product.template.html : product.template.adoc ;
+alias template : product.html product.template.html ;
+
 install html
 	:	barbarian.css index.html create.html use.html privacy.html api.html
 		license.html reference.html ../corum.json

@@ -1,0 +1,34 @@
+= xref:index.adoc[Barbarian]
+:copyright: Copyright 2022 René Ferdinand Rivera Morell
+:version-label!:
+:reproducible:
+:nofooter:
+:sectlinks:
+:linkcss:
+:stylesheet: barbarian.css
+:icons: font
+:caution-caption: ⚑
+:important-caption: ‼
+:note-caption: ℹ
+:tip-caption: ☀
+:warning-caption: ⚠
+:source-highlighter: rouge
+
+// tag::product_name[]
+== {PRODUCT_NAME}
+// end::product_name[]
+
+// tag::product_info[]
+[horizontal]
+License:: {PRODUCT_LICENSE}
+Homepage:: {PRODUCT_HOMEPAGE}
+Author:: {PRODUCT_AUTHOR}
+// end::product_info[]
+
+// tag::product_description[]
+== Description
+
+{DESCRIPTION_LONG}
+// end::product_description[]
+
+include::footer.part.adoc[]
