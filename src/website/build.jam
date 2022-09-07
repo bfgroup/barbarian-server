@@ -1,0 +1,67 @@
+#|
+Copyright 2022 René Ferdinand Rivera Morell
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE_1_0.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+|#
+import property ;
+import regex ;
+
+# Generate a site dependent htaccess.
+
+rule htaccess ( targets + : sources * : props * )
+{
+	local defs = [ property.select <define> : $(props) ] ;
+	local set_env ;
+	for local def in $(defs)
+	{
+		local kv = [ regex.split $(def:G=) "=" ] ;
+		set_env += "SetEnv $(kv:J= )" ;
+	}
+	local nl = "
+" ;
+	local set_env = $(set_env:J=$(nl)) ;
+	TEXT on $(targets) = "
+PassengerNodejs /home/bfgbarbarian/.nvm/versions/node/v13.14.0/bin/node
+PassengerFriendlyErrorPages on
+$(set_env)
+" ;
+}
+
+actions htaccess
+{
+	echo "@($(<):O=F:E=$(TEXT))"
+}
+
+make .htaccess : : @htaccess
+	:	<variant>debug:<define>NODE_ENV=test
+		<variant>release:<define>NODE_ENV=production
+		<relevant>variant
+	;
+
+# Put everything together in the web site output dir.
+
+install root
+	:	.htaccess
+		../../package.json
+	:	<variant>debug:<location>../../jenna.bfgroup.xyz
+		<variant>release:<location>../../barbarian.bfgroup.xyz
+	;
+
+install static
+	:	static//index.html
+		static//create.html
+		static//use.html
+		static//privacy.html
+		static//api.html
+		static//license.html
+		static//reference.html
+		static/barbarian.css
+		corum.json
+	:	<variant>debug:<location>../../jenna.bfgroup.xyz/static
+		<variant>release:<location>../../barbarian.bfgroup.xyz/static
+	;
+
+alias all
+	:	static root
+	;

@@ -7,9 +7,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 import property ;
 import common ;
 import stage ;
+import regex ;
 
 using asciidoctor ;
 
+# Corum API docs from spec.
 
 rule openapi-asciidoc ( targets + : sources * : props * )
 {
@@ -32,17 +34,13 @@ make api.gen.adoc : ../corum.json : @openapi-asciidoc
 
 install api-gen : api.gen.adoc : <location>. ;
 
+html api.html : api.adoc : <dependency>api-gen ;
+
+# The plain web site pages.
+
 html index.html : index.adoc ;
 html create.html : create.adoc ;
 html use.html : use.adoc ;
 html privacy.html : privacy.adoc ;
 html license.html : license.adoc ;
 html reference.html : reference.adoc ;
-html api.html : api.adoc : <dependency>api-gen ;
-
-install html
-	:	barbarian.css index.html create.html use.html privacy.html api.html
-		license.html reference.html ../corum.json
-	:	<variant>debug:<location>../../../jenna.bfgroup.xyz/static
-		<variant>release:<location>../../../barbarian.bfgroup.xyz/static
-	;
