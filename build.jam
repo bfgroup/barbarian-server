@@ -10,12 +10,14 @@ import property ;
 
 project /bfg_barbarian : build-dir .bin ;
 
+path-constant HERE : . ;
+
 make barbarian
 	:	[ glob src/website/*.ts ] tsconfig.json
 	:	@tsc
 	:	<variant>release:<flags>"--outDir barbarian.bfgroup.xyz"
 		<variant>debug:<flags>"--outDir jenna.bfgroup.xyz"
-		<dependency>src/website/static//html
+		<dependency>src/website//all
 		<relevant>variant
 	;
 
@@ -29,3 +31,26 @@ actions tsc
 {
 	tsc $(FLAGS) && echo "." > "$(<)"
 }
+
+#|
+make deploy
+	:	src/website/deploy_local.sh
+	:	@deploy
+	:	<variant>release:<flags>"barbarian"
+		<variant>debug:<flags>"jenna"
+		<dependency>barbarian
+		<relevant>variant
+	;
+explicit deploy ;
+
+rule deploy ( targets + : sources * : props * )
+{
+	local flags = [ property.select <flags> : $(props) ] ;
+	FLAGS on $(targets) = $(HERE) $(flags:G=) ;
+}
+
+actions deploy
+{
+	"$(>)" $(FLAGS)
+}
+|#

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 René Ferdinand Rivera Morell
+Copyright 2021-2022 René Ferdinand Rivera Morell
 Distributed under the Boost Software License, Version 1.0.
 (See accompanying file LICENSE.txt or copy at
 http://www.boost.org/LICENSE_1_0.txt)
@@ -40,7 +40,7 @@ const server_name = get_server_name();
 console.log('Server Name:', server_name);
 
 /*************************************************************************
- * Identify the two main modes of operation fro the server. Production is
+ * Identify the two main modes of operation for the server. Production is
  * what's released to "barbarian.bfgroup.xyz". And development will be
  * anything else, like local dev or the jenna test server.
  */
@@ -49,8 +49,12 @@ function is_production() {
 	return process.env.NODE_ENV === "production" || server_name === "barbarian.bfgroup.xyz";
 }
 
+function is_test() {
+	return process.env.NODE_ENV === "test" || server_name === "jenna.bfgroup.xyz";
+}
+
 function is_dev() {
-	return !is_production();
+	return process.env.NODE_ENV === "debug" || (!is_production() && !is_test());
 }
 
 /*************************************************************************
@@ -61,12 +65,15 @@ function is_dev() {
 var db_configuration: any;
 var app_package: any;
 
-if (is_production()) {
-	db_configuration = require('/home/bfgbarbarian/.dbconf.mysql.barbarian.bfg.js');
-	app_package = require('/home/bfgbarbarian/' + server_name + '/package.json');
-} else {
-	db_configuration = require(__dirname + '/../.dbconf.mysql.barbarian.bfg.js');
+if (is_dev()) {
+	db_configuration = require(__dirname + '/../.dbconf.dev.js');
 	app_package = require(__dirname + '/../package.json');
+} else if (is_test()) {
+	db_configuration = require('/home/bfgbarbarian/.dbconf.test.js');
+	app_package = require('/home/bfgbarbarian/' + server_name + '/package.json');
+} else if (is_production()) {
+	db_configuration = require('/home/bfgbarbarian/.dbconf.production.js');
+	app_package = require('/home/bfgbarbarian/' + server_name + '/package.json');
 }
 
 /*************************************************************************
@@ -623,6 +630,38 @@ function capabilities(req: Request, res: Response, next: any) {
 	next();
 }
 
+async function ensure_available(req: Request, res: Response, next: any) {
+	var is_available = true;
+	var reason = "Server is not in service.";
+	try {
+		var connection = undefined;
+		try {
+			connection = await db();
+			var [results,] = await connection.query<dbRow[]>(
+				"SELECT value FROM barbarian_meta WHERE id = 'status'");
+			if (results.length > 0) {
+				console.log("[INFO] ensure_available status = " + results[0].value);
+				var status = (typeof results[0].value === 'string')
+					? JSON.parse(results[0].value) : results[0].value;
+				is_available = status.in_service;
+				reason = "Server is not in service for maintenance.";
+			}
+		} finally {
+			db_release(connection);
+		}
+	} catch (e) {
+		is_available = false;
+		if (!is_production()) throw e;
+	}
+	if (!is_available) {
+		res.setHeader("Retry-After", 60 * 60);
+		send_error(res, 503, "[ERROR] " + reason);
+	}
+	else {
+		next();
+	}
+}
+
 async function track_download(req: Request, res: Response) {
 	try {
 		var connection = undefined;
@@ -676,6 +715,7 @@ app.use(ExpressGA('UA-15160295-7'));
 app.use(express.json());
 app.use(log);
 app.use(capabilities);
+app.use(ensure_available)
 app.use("/github/v1", epv1);
 app.use("/github/v2", epv2);
 app.use("/corum", corum_handle_request);

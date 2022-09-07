@@ -1,44 +1,44 @@
 {
-	"name": "barbarian",
-	"version": "0.2.2",
-	"description": "Barbarian is a Conan meta-server serving package recipes directly from GitHub repositories.",
-	"main": "barbarian.bfgroup.xyz/app.js",
-	"scripts": {
-		"prestart_barbarian": "npm run build",
-		"build_barbarian": "b2 barbarian variant=release",
-		"start_barbarian": "node barbarian.bfgroup.xyz/app.js",
-		"prestart_jenna": "npm run build_jenna",
-		"build_jenna": "b2 barbarian variant=debug",
-		"start_jenna": "node jenna.bfgroup.xyz/app.js"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/bfgroup/barbarian.git"
-	},
-	"keywords": [
-		"conan",
-		"package-manager",
-		"cplusplus",
-		"cpp",
-		"conan-packages",
-		"conan-server"
-	],
-	"author": "René Ferdinand Rivera Morell",
-	"license": "BSL-1.0",
-	"bugs": {
-		"url": "https://github.com/bfgroup/barbarian/issues"
-	},
-	"homepage": "https://github.com/bfgroup/barbarian#readme",
-	"dependencies": {
-		"express": "^4.17.1",
-		"express-universal-analytics": "^0.7.1",
-		"mysql2": "^2.3.2",
-		"node-fetch": "^2.6.1",
-		"openapi-backend": "^4.2.0"
-	},
-	"devDependencies": {
-		"@openapitools/openapi-generator-cli": "^2.4.12",
-		"@types/express": "^4.17.11",
-		"@types/node-fetch": "^2.5.10"
-	}
+  "name": "barbarian",
+  "version": "0.2.3",
+  "description": "Barbarian is a Conan meta-server serving package recipes directly from GitHub repositories.",
+  "main": "barbarian.bfgroup.xyz/app.js",
+  "scripts": {
+    "prestart_barbarian": "npm run build",
+    "build_barbarian": "b2 barbarian variant=release",
+    "start_barbarian": "node barbarian.bfgroup.xyz/app.js",
+    "prestart_jenna": "npm run build_jenna",
+    "build_jenna": "b2 barbarian variant=debug",
+    "start_jenna": "NODE_ENV=debug node jenna.bfgroup.xyz/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bfgroup/barbarian.git"
+  },
+  "keywords": [
+    "conan",
+    "package-manager",
+    "cplusplus",
+    "cpp",
+    "conan-packages",
+    "conan-server"
+  ],
+  "author": "René Ferdinand Rivera Morell",
+  "license": "BSL-1.0",
+  "bugs": {
+    "url": "https://github.com/bfgroup/barbarian/issues"
+  },
+  "homepage": "https://github.com/bfgroup/barbarian#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-universal-analytics": "^0.7.1",
+    "mysql2": "^2.3.2",
+    "node-fetch": "^2.6.1",
+    "openapi-backend": "^4.2.0"
+  },
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.4.12",
+    "@types/express": "^4.17.11",
+    "@types/node-fetch": "^2.5.10"
+  }
 }
