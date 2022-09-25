@@ -112,7 +112,7 @@ DB_PASSWORD, DB_DATABASE.
     def do_set_in_service(self, in_service=True):
         with self.db.atomic():
             meta, created = Meta.get_or_create(
-                key="status", defaults={'value': {'in_service': True}})
+                id="status", defaults={'value': {'in_service': True}})
             result = meta.value['in_service']
             meta.value['in_service'] = in_service
             meta.save()
@@ -123,7 +123,7 @@ DB_PASSWORD, DB_DATABASE.
         if in_service:
             print("Placed the database out of service for the migration.")
         with self.db.atomic():
-            version = Meta.get(Meta.key == "version")
+            version = Meta.get(Meta.id == "version")
             schema_version_past = int(version.value['schema'])
             schema_version_future = int(Meta.version['schema'])
             while schema_version_past < schema_version_future:
@@ -134,6 +134,9 @@ DB_PASSWORD, DB_DATABASE.
                 print("Migrating from schema version",
                       schema_version_past, "to", schema_version_future, "...")
                 getattr(self, migrate_f)(args)
+                with self.db.atomic():
+                    version.value['scheme'] = str(schema_version_past+1)
+                    version.save()
                 print("Migration to schema version",
                       schema_version_future, "complete.")
                 schema_version_past += 1

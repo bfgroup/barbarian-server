@@ -310,8 +310,11 @@ epv2.get('*', epv2_error);
  * Corum API..
  */
 
-var corum_api_path = __dirname + '/static/corum.json';
-if (process.env.NODE_ENV === "production") {
+var corum_api_path;
+if (is_dev()) {
+	corum_api_path = __dirname + '/static/corum.json';
+}
+else {
 	corum_api_path = '/home/bfgbarbarian/' + server_name + '/static/corum.json';
 }
 console.log("[INFO] corum_api_path = " + corum_api_path);
@@ -356,12 +359,19 @@ async function corum_not_found(context: OpenAPIContext, req: Request, res: Respo
 	return send_404(res);
 }
 
+type CorumMeta = {
+	api_version: string;
+	server_version: string;
+	server_name: string;
+	stability: string;
+};
+
 async function corum_meta(context: OpenAPIContext, req: Request, res: Response) {
-	var info = {
-		"api_version": context.api.definition.info.version,
-		"server_version": app_package.version,
-		"server_name": server_name,
-		"stability": "dev"
+	var info: CorumMeta = {
+		api_version: context.api.definition.info.version,
+		server_version: app_package.version,
+		server_name: server_name,
+		stability: "dev"
 	};
 	if (server_name == "barbarian.bfgroup.xyz") {
 		info.stability = "release";
@@ -369,13 +379,21 @@ async function corum_meta(context: OpenAPIContext, req: Request, res: Response) 
 	return send_json(res, info);
 }
 
-function corum_result_to_product_min(result: any) {
+type CorumProductMin = {
+	uuid: string;
+	name: string;
+	description_brief: string;
+	topic: [];
+	license: string;
+};
+
+function corum_result_to_product_min(result: any): CorumProductMin {
 	return {
-		"id": result.id,
-		"name": result.name,
-		"description_brief": (result.description_brief ?? ""),
-		"topic": (result.topic ?? "").split(" "),
-		"license": (result.license ?? "")
+		uuid: result.uuid,
+		name: result.name,
+		description_brief: (result.description_brief ?? ""),
+		topic: (result.topic ?? "").split(" "),
+		license: (result.license ?? "")
 	};
 }
 
@@ -386,11 +404,11 @@ async function corum_product_min_by_id(context: OpenAPIContext, req: Request, re
 			connection = await db();
 			const [results,] = await connection.query<dbRow[]>(
 				"SELECT"
-				+ " id, name, description_brief, topic, license"
+				+ " uuid, name, description_brief, topic, license"
 				+ " FROM barbarian_project"
-				+ " WHERE id = ?"
+				+ " WHERE uuid = ?"
 				+ " LIMIT 1",
-				[context.request.params.product_id]
+				[context.request.params.product_uuid]
 			);
 			if (results.length < 1) {
 				return send_404(res);
@@ -405,6 +423,19 @@ async function corum_product_min_by_id(context: OpenAPIContext, req: Request, re
 	}
 }
 
+type CorumProductFull = {
+	uuid: string;
+	name: string;
+	description_brief: string;
+	topic: [];
+	license: string;
+	updated?: string;
+	homepage?: string;
+	author?: string;
+	description_full?: object;
+	info?: any;
+};
+
 async function corum_product_full_by_id(context: OpenAPIContext, req: Request, res: Response) {
 	try {
 		var connection = undefined;
@@ -412,29 +443,38 @@ async function corum_product_full_by_id(context: OpenAPIContext, req: Request, r
 			connection = await db();
 			const [results,] = await connection.query<dbRow[]>(
 				"SELECT"
-				+ " id, name, description_brief, topic, license, updated, info"
+				+ " uuid, name, description_brief, topic, license, updated, info"
 				+ " FROM barbarian_project"
-				+ " WHERE id = ?"
+				+ " WHERE uuid = ?"
 				+ " LIMIT 1",
-				[context.request.params.product_id]
+				[context.request.params.product_uuid]
 			);
 			if (results.length < 1) {
 				return send_404(res);
 			} else {
-				var result = {
-					"id": results[0].id,
-					"name": results[0].name,
-					"description_brief": (results[0].description_brief ?? ""),
-					"topic": (results[0].topic ?? "").split(" "),
-					"license": (results[0].license ?? ""),
-					"updated": results[0].updated,
-					"homepage": results[0].info?.homepage,
-					"author": results[0].info?.author,
-					"description_long": {
-						"text": results[0].info?.barbarian?.description?.text,
-						"format": results[0].info?.barbarian?.description?.format
-					}
+				var result: CorumProductFull = {
+					uuid: results[0].uuid,
+					name: results[0].name,
+					description_brief: (results[0].description_brief ?? ""),
+					topic: (results[0].topic ?? "").split(" "),
+					license: (results[0].license ?? ""),
+					updated: results[0].updated,
+					homepage: results[0].info?.homepage,
+					author: results[0].info?.author
 				};
+				var info = JSON.parse(results[0].info);
+				if (info && info.barbarian !== undefined && info.barbarian.description !== undefined) {
+					result.description_full = {
+						"text": info.barbarian.description.text,
+						"format": info.barbarian.description.format
+					};
+					delete info["barbarian"];
+					delete info["name"];
+					delete info["topics"];
+					delete info["license"];
+					delete info["description"];
+					result.info = info;
+				}
 				return send_json(res, result);
 			}
 		} finally {
@@ -444,6 +484,13 @@ async function corum_product_full_by_id(context: OpenAPIContext, req: Request, r
 		return send_error(res, 500, "[ERROR] " + e);
 	}
 }
+
+type CorumProductMinList = {
+	start: number;
+	count: number;
+	total: number;
+	products: CorumProductMin[];
+};
 
 function corum_product_search_build_query(req: Request, for_count: boolean): string {
 	var match_fields = [];
@@ -455,7 +502,7 @@ function corum_product_search_build_query(req: Request, for_count: boolean): str
 	var query = "SELECT"
 		+ (for_count
 			? " COUNT(*) as total"
-			: " id, name, description_brief, topic, license")
+			: " uuid, name, description_brief, topic, license")
 		+ " FROM barbarian_project"
 		+ " WHERE"
 		+ " MATCH(" + match_fields.join(",") + ")"
@@ -485,14 +532,14 @@ async function corum_product_search(context: OpenAPIContext, req: Request, res: 
 			if (count.length < 1) {
 				return send_404(res);
 			}
-			var products = results.map(result => {
+			var products: CorumProductMin[] = results.map(result => {
 				return corum_result_to_product_min(result);
 			});
-			var info = {
-				"start": offset,
-				"count": products.length,
-				"total": count[0].total,
-				"products": products
+			var info: CorumProductMinList = {
+				start: offset,
+				count: products.length,
+				total: count[0].total,
+				products: products
 			};
 			return send_json(res, info);
 		} finally {

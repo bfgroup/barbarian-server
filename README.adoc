@@ -1,6 +1,57 @@
 = Barbarian
 
-Barbarian is a Conan meta-server providing package recipes directly from GitHub repositories.
+Barbarian is a Conan meta-server providing package recipes directly from GitHub
+repositories.
+
+== Introduction
+
+This is the server component of Barbarian with accompanying tools to maintain
+its operation. It's composed of: a back-end MySQL (or MariaDB) database, a
+NodeJS web site with REST end points, a Python tool to maintain the database.
+
+NOTE: The level of development of this service is "alpha". Which means that
+everything is subject to change. And that the development procedures are in an
+incomplete and rough state. This will improve over time.
+
+== Development
+
+Developing changes to the server is done almost entirely locally with the help
+of: running a local database instance, running a local NodeJS server, targeting
+the Conan and other tools to `localhost` endpoints, building with B2, and
+debugging in VScode. As such the requirements for local development are:
+
+* https://code.visualstudio.com/[VScode] (recommended plugins: AsciiDoc,
+	Boost.Jam, OpenAPI Editor, Python)
+* https://www.bfgroup.xyz/b2/[B2] >=4.9
+* MySQL, or MariaDB, database
+* https://www.python.org/[Python] >=3.x
+* https://conan.io/[Conan] >=1.51
+* https://asciidoctor.org/[Asciidoctor] >=2.0
+* https://www.npmjs.com/package/@openapitools/openapi-generator-cli[OpenAPI Generator]
+	>=5.2.1
+* Java Runtime (for OpenAPI Generator)
+
+WARNING: This server and tools is developed and run in Linux environments.
+Hence, it is unlikely it works in other environments. But contributions to
+address that are welcomed.
+
+WARNING: There currently is zero automated testing, local or otherwise. All
+testing is done manually during development. Contributions to add such automated
+testing will be appreciated.
+
+== Deployment
+
+The procedure for deploying a new version of the server to either the Jenna or
+Barbarian live service is currently a manual operation that requires specific
+access permissions. Below is a checklist for how to perform the deployment as
+reference. This list assumes working dir is this project's root.
+
+. Install Rosina tool: `pip install --upgrade .`
+. Disable services: `rosina turnoff`
+. Migrate database schema: `rosina migrate`
+. Deploy to Jenna (testing) and/or Barbarian (production) server:
+	`./deploy.sh jenna.bfgroup.xyz` or `./deploy.sh barbarian.bfgroup.xyz`
+. Enable ervices: `rosina turnon`
 
 == License
 

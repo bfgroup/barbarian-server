@@ -18,16 +18,16 @@ Provides information for packages available through the Barbarian service.
 [.getProductFullById]
 ==== getProductFullById
     
-`GET /product/full/{product_id}`
+`GET /product/full/{product_uuid}`
 
-Product by ID.
+Product by UUID.
 
 ===== Description 
 
 Get identified project full information. (<<ProductFull>>)
 
 
-// markup not found, no include::{specDir}product/full/\{product_id\}/GET/spec.adoc[opts=optional]
+// markup not found, no include::{specDir}product/full/\{product_uuid\}/GET/spec.adoc[opts=optional]
 
 
 
@@ -39,8 +39,8 @@ Get identified project full information. (<<ProductFull>>)
 |===         
 |Name| Description| Required| Default| Pattern
 
-| product_id 
-| The numerical ID of the product.  
+| product_uuid 
+| The hexadecimal UUID of the product.  
 | X 
 | null 
 |  
@@ -83,20 +83,20 @@ Get identified project full information. (<<ProductFull>>)
 ===== Samples
 
 
-// markup not found, no include::{snippetDir}product/full/\{product_id\}/GET/http-request.adoc[opts=optional]
+// markup not found, no include::{snippetDir}product/full/\{product_uuid\}/GET/http-request.adoc[opts=optional]
 
 
-// markup not found, no include::{snippetDir}product/full/\{product_id\}/GET/http-response.adoc[opts=optional]
+// markup not found, no include::{snippetDir}product/full/\{product_uuid\}/GET/http-response.adoc[opts=optional]
 
 
 
-// file not found, no * wiremock data link :product/full/{product_id}/GET/GET.json[]
+// file not found, no * wiremock data link :product/full/{product_uuid}/GET/GET.json[]
 
 
 ifdef::internal-generation[]
 ===== Implementation
 
-// markup not found, no include::{specDir}product/full/\{product_id\}/GET/implementation.adoc[opts=optional]
+// markup not found, no include::{specDir}product/full/\{product_uuid\}/GET/implementation.adoc[opts=optional]
 
 
 endif::internal-generation[]
@@ -105,16 +105,16 @@ endif::internal-generation[]
 [.getProductMinById]
 ==== getProductMinById
     
-`GET /product/min/{product_id}`
+`GET /product/min/{product_uuid}`
 
-Product by ID.
+Product by UUID.
 
 ===== Description 
 
 Get identified project basic information. (<<ProductMin>>)
 
 
-// markup not found, no include::{specDir}product/min/\{product_id\}/GET/spec.adoc[opts=optional]
+// markup not found, no include::{specDir}product/min/\{product_uuid\}/GET/spec.adoc[opts=optional]
 
 
 
@@ -126,8 +126,8 @@ Get identified project basic information. (<<ProductMin>>)
 |===         
 |Name| Description| Required| Default| Pattern
 
-| product_id 
-| The numerical ID of the product.  
+| product_uuid 
+| The hexadecimal UUID of the product.  
 | X 
 | null 
 |  
@@ -170,20 +170,20 @@ Get identified project basic information. (<<ProductMin>>)
 ===== Samples
 
 
-// markup not found, no include::{snippetDir}product/min/\{product_id\}/GET/http-request.adoc[opts=optional]
+// markup not found, no include::{snippetDir}product/min/\{product_uuid\}/GET/http-request.adoc[opts=optional]
 
 
-// markup not found, no include::{snippetDir}product/min/\{product_id\}/GET/http-response.adoc[opts=optional]
+// markup not found, no include::{snippetDir}product/min/\{product_uuid\}/GET/http-response.adoc[opts=optional]
 
 
 
-// file not found, no * wiremock data link :product/min/{product_id}/GET/GET.json[]
+// file not found, no * wiremock data link :product/min/{product_uuid}/GET/GET.json[]
 
 
 ifdef::internal-generation[]
 ===== Implementation
 
-// markup not found, no include::{specDir}product/min/\{product_id\}/GET/implementation.adoc[opts=optional]
+// markup not found, no include::{specDir}product/min/\{product_uuid\}/GET/implementation.adoc[opts=optional]
 
 
 endif::internal-generation[]
@@ -461,11 +461,11 @@ Information about the server and API.
 |===         
 | Field Name| Required| Type| Description| Format
 
-| id 
+| uuid 
 | X 
-| Long  
-| Numeric unique identifier for project.
-| int64 
+| UUID  
+| Unique identifier for project.
+| uuid 
 
 | name 
 | X 
@@ -515,6 +515,12 @@ Information about the server and API.
 | 
 |  
 
+| info 
+|  
+| Object  
+| Additional custom information of the project. Often this is package specific. And may duplicate some of the other information.
+|  
+
 |===
 
 
@@ -528,11 +534,11 @@ Information about the server and API.
 |===         
 | Field Name| Required| Type| Description| Format
 
-| id 
+| uuid 
 | X 
-| Long  
-| Numeric unique identifier for project.
-| int64 
+| UUID  
+| Unique identifier for project.
+| uuid 
 
 | name 
 | X 

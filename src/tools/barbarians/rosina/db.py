@@ -70,7 +70,7 @@ class Meta(Model):
     Metadata about the database and its schema. It's a freeform key=value
     store where the value is a JSON object.
     """
-    key = peewee.CharField(max_length=100, primary_key=True)  # varchar(100)
+    id = peewee.CharField(max_length=100, primary_key=True)  # varchar(100)
     value = JSONField(null=True)  # JSON
 
     version = {"schema": "2"}

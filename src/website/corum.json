@@ -2,7 +2,7 @@
   "openapi": "3.0.2",
   "info": {
     "title": "Barbarian Package Index",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "license": {
       "name": "BSL-1.0",
       "url": "https://www.boost.org/LICENSE_1_0.txt"
@@ -171,15 +171,14 @@
       "product_min": {
         "type": "object",
         "required": [
-          "id",
+          "uuid",
           "name"
         ],
         "properties": {
-          "id": {
-            "description": "Numeric unique identifier for project.",
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
+          "uuid": {
+            "description": "Unique identifier for project.",
+            "type": "string",
+            "format": "uuid"
           },
           "name": {
             "description": "Unique symbolic name for project.",
@@ -210,14 +209,14 @@
       "product_full": {
         "type": "object",
         "required": [
-          "id",
+          "uuid",
           "name"
         ],
         "properties": {
-          "id": {
-            "description": "Numeric unique identifier for project.",
-            "type": "integer",
-            "format": "int64",
+          "uuid": {
+            "description": "Unique identifier for project.",
+            "type": "string",
+            "format": "uuid",
             "minimum": 0
           },
           "name": {
@@ -262,6 +261,11 @@
           },
           "description_long": {
             "$ref": "#/components/schemas/description"
+          },
+          "info": {
+            "description": "Additional custom information of the project. Often this is package specific. And may duplicate some of the other information.",
+            "type": "object",
+            "nullable": true
           }
         }
       }
@@ -313,14 +317,14 @@
           }
         }
       },
-      "product_id": {
-        "name": "product_id",
+      "product_uuid": {
+        "name": "product_uuid",
         "in": "path",
         "required": true,
-        "description": "The numerical ID of the product.",
+        "description": "The hexadecimal UUID of the product.",
         "schema": {
-          "type": "integer",
-          "format": "int64"
+          "type": "string",
+          "format": "uuid"
         }
       }
     }
@@ -376,9 +380,9 @@
         }
       }
     },
-    "/product/full/{product_id}": {
+    "/product/full/{product_uuid}": {
       "get": {
-        "summary": "Product by ID.",
+        "summary": "Product by UUID.",
         "description": "Get identified project full information. (<<ProductFull>>)",
         "tags": [
           "product"
@@ -386,7 +390,7 @@
         "operationId": "get_product_full_by_id",
         "parameters": [
           {
-            "$ref": "#/components/parameters/product_id"
+            "$ref": "#/components/parameters/product_uuid"
           }
         ],
         "responses": {
@@ -406,9 +410,9 @@
         }
       }
     },
-    "/product/min/{product_id}": {
+    "/product/min/{product_uuid}": {
       "get": {
-        "summary": "Product by ID.",
+        "summary": "Product by UUID.",
         "description": "Get identified project basic information. (<<ProductMin>>)",
         "tags": [
           "product"
@@ -416,7 +420,7 @@
         "operationId": "get_product_min_by_id",
         "parameters": [
           {
-            "$ref": "#/components/parameters/product_id"
+            "$ref": "#/components/parameters/product_uuid"
           }
         ],
         "responses": {
