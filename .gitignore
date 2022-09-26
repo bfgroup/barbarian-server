@@ -6,3 +6,5 @@
 /.dbconf.*
 __pycache__
 openapitools.json
+*.egg-info
+/build
