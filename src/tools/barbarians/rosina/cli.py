@@ -173,8 +173,11 @@ DB_PASSWORD, DB_DATABASE.
         playhouse.migrate.migrate(
             migrator.drop_index('barbarian_package', 'unique_package'))
         # Project.. Rename & retype columns, and refill with new data.
+        # The playhouse migrate fails on mysql renames because the column
+        # descriptions come back as binary instead of text. So we do the rename.
+        self.db.execute_sql(
+            'ALTER TABLE barbarian_project RENAME COLUMN id TO uuid;')
         playhouse.migrate.migrate(
-            migrator.rename_column('barbarian_project', 'id', 'uuid'),
             migrator.alter_column_type('barbarian_project', 'uuid', peewee.UUIDField(primary_key=True)))
         with self.db.atomic():
             for project_id, project_uuid in project_id2uuid.items():

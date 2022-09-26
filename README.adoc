@@ -47,11 +47,11 @@ access permissions. Below is a checklist for how to perform the deployment as
 reference. This list assumes working dir is this project's root.
 
 . Install Rosina tool: `pip install --upgrade .`
-. Disable services: `barbarian_rosina turnoff`
-. Migrate database schema: `barbarian_rosina migrate`
+. Disable services: `./.dbconf.production.sh barbarian_rosina turnoff`
+. Migrate database schema: `./.dbconf.production.sh barbarian_rosina migrate`
 . Deploy to Jenna (testing) and/or Barbarian (production) server:
-	`./deploy.sh jenna.bfgroup.xyz` or `./deploy.sh barbarian.bfgroup.xyz`
-. Enable ervices: `barbarian_rosina turnon`
+	`./deploy.sh jenna` and/or `./deploy.sh barbarian`
+. Enable services: `./.dbconf.production.sh barbarian_rosina turnon`
 
 == License
 

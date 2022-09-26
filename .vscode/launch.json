@@ -1,32 +1,42 @@
 {
-	"configurations": [
-		{
-			"name": "Launch Barbarian",
-			"request": "launch",
-			"runtimeArgs": [
-				"run-script",
-				"start_barbarian"
-			],
-			"runtimeExecutable": "npm",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
-			"type": "pwa-node",
+  "configurations": [
+    {
+      "name": "Python: Rosina Migrate, Production",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/rosina.py",
+      "args": ["migrate"],
+      "envFile": "${workspaceFolder}/.dbconf.production.env",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Launch Barbarian",
+      "request": "launch",
+      "runtimeArgs": [
+        "run-script",
+        "start_barbarian"
+      ],
+      "runtimeExecutable": "npm",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "pwa-node",
       "outputCapture": "std"
-		},
-		{
-			"name": "Launch Jenna",
-			"request": "launch",
-			"runtimeArgs": [
-				"run-script",
-				"start_jenna"
-			],
-			"runtimeExecutable": "npm",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
-			"type": "pwa-node",
+    },
+    {
+      "name": "Launch Jenna",
+      "request": "launch",
+      "runtimeArgs": [
+        "run-script",
+        "start_jenna"
+      ],
+      "runtimeExecutable": "npm",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "pwa-node",
       "outputCapture": "std"
-		}
-	]
+    }
+  ]
 }
