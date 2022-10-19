@@ -214,6 +214,12 @@ async function epv2_search(req: Request, res: Response) {
 			query = query?.replace(/_/g, '\\_');
 			query = query?.replace(/%/g, '\\%');
 			query = query?.replace(/[*]/g, '%');
+			// We need to match the full reference. Which includes the rev hash.
+			// But if the query is already looking for a rev hash match we don't
+			// need to match for it.
+			if (!query?.includes("#")) {
+				query = query?.concat("#%");
+			}
 			var binary = "";
 			if (('ignorecase' in req.query) && req.query.ignorecase == "False") {
 				binary = "BINARY";
@@ -223,7 +229,7 @@ async function epv2_search(req: Request, res: Response) {
 				+ " CONCAT(name, '/', version, '@', identity) as ref"
 				+ " FROM barbarian_package"
 				+ " WHERE packager = 'conan'"
-				+ " AND CONCAT(name,'/',version) LIKE " + binary + " ?"
+				+ " AND CONCAT(name, '/', version, '@', identity) LIKE " + binary + " ?"
 				+ " ORDER BY name"
 				+ " LIMIT 100",
 				[query]);
